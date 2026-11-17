@@ -1,0 +1,11 @@
+-- CHECK: the price paid must be greater than zero.
+-- expect-constraint: order_item_unit_price_ck
+-- EXPECTED: fails with psql exit code 3. Verbose errors print the constraint name.
+\set VERBOSITY verbose
+INSERT INTO order_item (order_id, variant_id, quantity, unit_price) VALUES (2, 1, 1, -5.00);
+psql:/work/sql/violations/v07_check_negative_unit_price.sql:5: ERROR:  23514: new row for relation "order_item" violates check constraint "order_item_unit_price_ck"
+DETAIL:  Failing row contains (2, 1, 1, -5.00).
+SCHEMA NAME:  public
+TABLE NAME:  order_item
+CONSTRAINT NAME:  order_item_unit_price_ck
+LOCATION:  ExecConstraints, execMain.c:2092

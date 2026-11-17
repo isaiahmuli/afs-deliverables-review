@@ -1,0 +1,11 @@
+-- UNIQUE: two customers cannot share an email.
+-- expect-constraint: customer_email_uq
+-- EXPECTED: fails with psql exit code 3. Verbose errors print the constraint name.
+\set VERBOSITY verbose
+INSERT INTO customer (email, full_name) VALUES ('amina@example.com', 'Another Amina');
+psql:/work/sql/violations/v02_unique_customer_email.sql:5: ERROR:  23505: duplicate key value violates unique constraint "customer_email_uq"
+DETAIL:  Key (email)=(amina@example.com) already exists.
+SCHEMA NAME:  public
+TABLE NAME:  customer
+CONSTRAINT NAME:  customer_email_uq
+LOCATION:  _bt_check_unique, nbtinsert.c:666

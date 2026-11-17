@@ -1,0 +1,144 @@
+                                                      Table "public.customer"
+   Column    |  Type   | Collation | Nullable |           Default            | Storage  | Compression | Stats target | Description 
+-------------+---------+-----------+----------+------------------------------+----------+-------------+--------------+-------------
+ customer_id | integer |           | not null | generated always as identity | plain    |             |              | 
+ email       | text    |           | not null |                              | extended |             |              | 
+ full_name   | text    |           | not null |                              | extended |             |              | 
+Indexes:
+    "customer_pk" PRIMARY KEY, btree (customer_id)
+    "customer_email_uq" UNIQUE CONSTRAINT, btree (email)
+Check constraints:
+    "customer_email_format_ck" CHECK (email ~~ '_%@_%._%'::text)
+    "customer_email_lower_ck" CHECK (email = lower(email))
+    "customer_full_name_ck" CHECK (btrim(full_name) <> ''::text)
+Referenced by:
+    TABLE "customer_order" CONSTRAINT "customer_order_customer_fk" FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE RESTRICT
+Not-null constraints:
+    "customer_customer_id_not_null" NOT NULL "customer_id"
+    "customer_email_nn" NOT NULL "email"
+    "customer_full_name_nn" NOT NULL "full_name"
+Access method: heap
+
+                                                          Table "public.product"
+    Column     |     Type      | Collation | Nullable |           Default            | Storage  | Compression | Stats target | Description 
+---------------+---------------+-----------+----------+------------------------------+----------+-------------+--------------+-------------
+ product_id    | integer       |           | not null | generated always as identity | plain    |             |              | 
+ name          | text          |           | not null |                              | extended |             |              | 
+ current_price | numeric(19,2) |           | not null |                              | main     |             |              | 
+Indexes:
+    "product_pk" PRIMARY KEY, btree (product_id)
+    "product_name_uq" UNIQUE CONSTRAINT, btree (name)
+Check constraints:
+    "product_current_price_ck" CHECK (current_price > 0::numeric)
+Referenced by:
+    TABLE "product_variant" CONSTRAINT "product_variant_product_fk" FOREIGN KEY (product_id) REFERENCES product(product_id) ON DELETE RESTRICT
+Not-null constraints:
+    "product_product_id_not_null" NOT NULL "product_id"
+    "product_name_nn" NOT NULL "name"
+    "product_current_price_nn" NOT NULL "current_price"
+Access method: heap
+
+                                                        Table "public.size"
+   Column   |   Type   | Collation | Nullable |           Default            | Storage  | Compression | Stats target | Description 
+------------+----------+-----------+----------+------------------------------+----------+-------------+--------------+-------------
+ size_id    | integer  |           | not null | generated always as identity | plain    |             |              | 
+ code       | text     |           | not null |                              | extended |             |              | 
+ sort_order | smallint |           | not null |                              | plain    |             |              | 
+Indexes:
+    "size_pk" PRIMARY KEY, btree (size_id)
+    "size_code_uq" UNIQUE CONSTRAINT, btree (code)
+    "size_sort_order_uq" UNIQUE CONSTRAINT, btree (sort_order)
+Referenced by:
+    TABLE "product_variant" CONSTRAINT "product_variant_size_fk" FOREIGN KEY (size_id) REFERENCES size(size_id) ON DELETE RESTRICT
+Not-null constraints:
+    "size_size_id_not_null" NOT NULL "size_id"
+    "size_code_nn" NOT NULL "code"
+    "size_sort_order_nn" NOT NULL "sort_order"
+Access method: heap
+
+                                                      Table "public.colour"
+  Column   |  Type   | Collation | Nullable |           Default            | Storage  | Compression | Stats target | Description 
+-----------+---------+-----------+----------+------------------------------+----------+-------------+--------------+-------------
+ colour_id | integer |           | not null | generated always as identity | plain    |             |              | 
+ name      | text    |           | not null |                              | extended |             |              | 
+Indexes:
+    "colour_pk" PRIMARY KEY, btree (colour_id)
+    "colour_name_uq" UNIQUE CONSTRAINT, btree (name)
+Referenced by:
+    TABLE "product_variant" CONSTRAINT "product_variant_colour_fk" FOREIGN KEY (colour_id) REFERENCES colour(colour_id) ON DELETE RESTRICT
+Not-null constraints:
+    "colour_colour_id_not_null" NOT NULL "colour_id"
+    "colour_name_nn" NOT NULL "name"
+Access method: heap
+
+                                                   Table "public.product_variant"
+     Column     |  Type   | Collation | Nullable |           Default            | Storage | Compression | Stats target | Description 
+----------------+---------+-----------+----------+------------------------------+---------+-------------+--------------+-------------
+ variant_id     | integer |           | not null | generated always as identity | plain   |             |              | 
+ product_id     | integer |           | not null |                              | plain   |             |              | 
+ size_id        | integer |           | not null |                              | plain   |             |              | 
+ colour_id      | integer |           | not null |                              | plain   |             |              | 
+ stock_quantity | integer |           | not null |                              | plain   |             |              | 
+Indexes:
+    "product_variant_pk" PRIMARY KEY, btree (variant_id)
+    "product_variant_option_uq" UNIQUE CONSTRAINT, btree (product_id, size_id, colour_id)
+Check constraints:
+    "product_variant_stock_quantity_ck" CHECK (stock_quantity >= 0)
+Foreign-key constraints:
+    "product_variant_colour_fk" FOREIGN KEY (colour_id) REFERENCES colour(colour_id) ON DELETE RESTRICT
+    "product_variant_product_fk" FOREIGN KEY (product_id) REFERENCES product(product_id) ON DELETE RESTRICT
+    "product_variant_size_fk" FOREIGN KEY (size_id) REFERENCES size(size_id) ON DELETE RESTRICT
+Referenced by:
+    TABLE "order_item" CONSTRAINT "order_item_variant_fk" FOREIGN KEY (variant_id) REFERENCES product_variant(variant_id) ON DELETE RESTRICT
+Not-null constraints:
+    "product_variant_variant_id_not_null" NOT NULL "variant_id"
+    "product_variant_product_id_nn" NOT NULL "product_id"
+    "product_variant_size_id_nn" NOT NULL "size_id"
+    "product_variant_colour_id_nn" NOT NULL "colour_id"
+    "product_variant_stock_quantity_nn" NOT NULL "stock_quantity"
+Access method: heap
+
+                                                           Table "public.customer_order"
+   Column    |           Type           | Collation | Nullable |           Default            | Storage | Compression | Stats target | Description 
+-------------+--------------------------+-----------+----------+------------------------------+---------+-------------+--------------+-------------
+ order_id    | integer                  |           | not null | generated always as identity | plain   |             |              | 
+ customer_id | integer                  |           | not null |                              | plain   |             |              | 
+ ordered_at  | timestamp with time zone |           | not null |                              | plain   |             |              | 
+Indexes:
+    "customer_order_pk" PRIMARY KEY, btree (order_id)
+Foreign-key constraints:
+    "customer_order_customer_fk" FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE RESTRICT
+Referenced by:
+    TABLE "order_item" CONSTRAINT "order_item_order_fk" FOREIGN KEY (order_id) REFERENCES customer_order(order_id) ON DELETE CASCADE
+Not-null constraints:
+    "customer_order_order_id_not_null" NOT NULL "order_id"
+    "customer_order_customer_id_nn" NOT NULL "customer_id"
+    "customer_order_ordered_at_nn" NOT NULL "ordered_at"
+Triggers:
+    customer_order_has_items_ck AFTER INSERT ON customer_order DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION customer_order_has_items()
+Access method: heap
+
+                                            Table "public.order_item"
+   Column   |     Type      | Collation | Nullable | Default | Storage | Compression | Stats target | Description 
+------------+---------------+-----------+----------+---------+---------+-------------+--------------+-------------
+ order_id   | integer       |           | not null |         | plain   |             |              | 
+ variant_id | integer       |           | not null |         | plain   |             |              | 
+ quantity   | integer       |           | not null |         | plain   |             |              | 
+ unit_price | numeric(19,2) |           | not null |         | main    |             |              | 
+Indexes:
+    "order_item_pk" PRIMARY KEY, btree (order_id, variant_id)
+Check constraints:
+    "order_item_quantity_ck" CHECK (quantity > 0)
+    "order_item_unit_price_ck" CHECK (unit_price > 0::numeric)
+Foreign-key constraints:
+    "order_item_order_fk" FOREIGN KEY (order_id) REFERENCES customer_order(order_id) ON DELETE CASCADE
+    "order_item_variant_fk" FOREIGN KEY (variant_id) REFERENCES product_variant(variant_id) ON DELETE RESTRICT
+Not-null constraints:
+    "order_item_order_id_nn" NOT NULL "order_id"
+    "order_item_variant_id_nn" NOT NULL "variant_id"
+    "order_item_quantity_nn" NOT NULL "quantity"
+    "order_item_unit_price_nn" NOT NULL "unit_price"
+Triggers:
+    order_item_keeps_order_nonempty_ck AFTER DELETE OR UPDATE OF order_id ON order_item DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION customer_order_has_items()
+Access method: heap
+

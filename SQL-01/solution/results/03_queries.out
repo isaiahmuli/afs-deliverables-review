@@ -1,0 +1,69 @@
+-- 03_queries.sql: runs every read-only join query in order, for a readable transcript.
+-- Each query is also compared on its own against a hand-written CSV in expected/.
+\echo '--- Q1: Amina''s orders with product, size, and colour'
+--- Q1: Amina's orders with product, size, and colour
+\ir queries/q1_customer_orders.sql
+-- Q1: Amina's orders with product, size, and colour (oldest first). Expected: expected/q1_customer_orders.csv
+SET TIME ZONE 'Africa/Nairobi';
+SET
+SELECT o.order_id,
+       to_char(o.ordered_at, 'YYYY-MM-DD HH24:MI') AS ordered_at,
+       p.name        AS product,
+       s.code        AS size,
+       c.name        AS colour,
+       oi.quantity,
+       oi.unit_price AS price_paid
+FROM customer cu
+JOIN customer_order  o  ON o.customer_id = cu.customer_id
+JOIN order_item      oi ON oi.order_id   = o.order_id
+JOIN product_variant pv ON pv.variant_id = oi.variant_id
+JOIN product         p  ON p.product_id  = pv.product_id
+JOIN size            s  ON s.size_id     = pv.size_id
+JOIN colour          c  ON c.colour_id   = pv.colour_id
+WHERE cu.email = 'amina@example.com'
+ORDER BY o.ordered_at, p.name, s.sort_order, c.name;
+ order_id |    ordered_at    |   product   | size | colour | quantity | price_paid 
+----------+------------------+-------------+------+--------+----------+------------
+        1 | 2026-10-01 10:15 | Linen Shirt | S    | White  |        2 |      45.00
+        1 | 2026-10-01 10:15 | Wrap Dress  | S    | Olive  |        1 |      75.50
+        3 | 2026-11-02 09:30 | Linen Shirt | M    | Navy   |        1 |      49.00
+(3 rows)
+
+\echo '--- Q2: Product options low on stock (<= 3)'
+--- Q2: Product options low on stock (<= 3)
+\ir queries/q2_low_stock.sql
+-- Q2: Product options low on stock (3 or fewer units), lowest first. Expected: expected/q2_low_stock.csv
+SELECT p.name AS product,
+       s.code AS size,
+       c.name AS colour,
+       pv.stock_quantity
+FROM product_variant pv
+JOIN product p ON p.product_id = pv.product_id
+JOIN size    s ON s.size_id    = pv.size_id
+JOIN colour  c ON c.colour_id  = pv.colour_id
+WHERE pv.stock_quantity <= 3
+ORDER BY pv.stock_quantity, p.name, s.sort_order, c.name;
+   product    | size | colour | stock_quantity 
+--------------+------+--------+----------------
+ Denim Jacket | M    | Navy   |              1
+ Linen Shirt  | M    | White  |              2
+ Wrap Dress   | S    | Olive  |              3
+(3 rows)
+
+\echo '--- Q3: Customers and their order counts'
+--- Q3: Customers and their order counts
+\ir queries/q3_customer_order_counts.sql
+-- Q3: Every customer with their order count; LEFT JOIN keeps customers with no orders.
+-- Expected: expected/q3_customer_order_counts.csv
+SELECT cu.full_name, cu.email, count(o.order_id) AS orders
+FROM customer cu
+LEFT JOIN customer_order o ON o.customer_id = cu.customer_id
+GROUP BY cu.customer_id
+ORDER BY cu.full_name;
+   full_name   |       email       | orders 
+---------------+-------------------+--------
+ Amina Wanjiru | amina@example.com |      2
+ Brian Otieno  | brian@example.com |      1
+ Chloe Mwangi  | chloe@example.com |      0
+(3 rows)
+

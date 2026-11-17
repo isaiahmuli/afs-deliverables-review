@@ -1,0 +1,11 @@
+-- CHECK: emails are stored in lower case, so a case-variant duplicate cannot sneak past the UNIQUE rule.
+-- expect-constraint: customer_email_lower_ck
+-- EXPECTED: fails with psql exit code 3. Verbose errors print the constraint name.
+\set VERBOSITY verbose
+INSERT INTO customer (email, full_name) VALUES ('Amina@Example.com', 'Amina Again');
+psql:/work/sql/violations/v03_check_customer_email_lower.sql:5: ERROR:  23514: new row for relation "customer" violates check constraint "customer_email_lower_ck"
+DETAIL:  Failing row contains (6, Amina@Example.com, Amina Again).
+SCHEMA NAME:  public
+TABLE NAME:  customer
+CONSTRAINT NAME:  customer_email_lower_ck
+LOCATION:  ExecConstraints, execMain.c:2092

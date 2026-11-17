@@ -1,0 +1,73 @@
+--- Tables without a primary key (must be 0)
+ tables_without_pk 
+-------------------
+                 0
+(1 row)
+
+--- Foreign keys and their ON DELETE action (compare with erd.md)
+   child_table   |      constraint_name       |  parent_table   | on_delete 
+-----------------+----------------------------+-----------------+-----------
+ product_variant | product_variant_colour_fk  | colour          | RESTRICT
+ product_variant | product_variant_product_fk | product         | RESTRICT
+ product_variant | product_variant_size_fk    | size            | RESTRICT
+ customer_order  | customer_order_customer_fk | customer        | RESTRICT
+ order_item      | order_item_order_fk        | customer_order  | CASCADE
+ order_item      | order_item_variant_fk      | product_variant | RESTRICT
+(6 rows)
+
+--- All named constraints by kind (p=primary key, f=foreign key, u=unique, c=check, n=not null, t=trigger)
+   table_name    | kind |           constraint_name           
+-----------------+------+-------------------------------------
+ customer        | c    | customer_email_format_ck
+ customer        | c    | customer_email_lower_ck
+ customer        | c    | customer_full_name_ck
+ customer        | n    | customer_customer_id_not_null
+ customer        | n    | customer_email_nn
+ customer        | n    | customer_full_name_nn
+ customer        | p    | customer_pk
+ customer        | u    | customer_email_uq
+ product         | c    | product_current_price_ck
+ product         | n    | product_current_price_nn
+ product         | n    | product_name_nn
+ product         | n    | product_product_id_not_null
+ product         | p    | product_pk
+ product         | u    | product_name_uq
+ size            | n    | size_code_nn
+ size            | n    | size_size_id_not_null
+ size            | n    | size_sort_order_nn
+ size            | p    | size_pk
+ size            | u    | size_code_uq
+ size            | u    | size_sort_order_uq
+ colour          | n    | colour_colour_id_not_null
+ colour          | n    | colour_name_nn
+ colour          | p    | colour_pk
+ colour          | u    | colour_name_uq
+ product_variant | c    | product_variant_stock_quantity_ck
+ product_variant | f    | product_variant_colour_fk
+ product_variant | f    | product_variant_product_fk
+ product_variant | f    | product_variant_size_fk
+ product_variant | n    | product_variant_colour_id_nn
+ product_variant | n    | product_variant_product_id_nn
+ product_variant | n    | product_variant_size_id_nn
+ product_variant | n    | product_variant_stock_quantity_nn
+ product_variant | n    | product_variant_variant_id_not_null
+ product_variant | p    | product_variant_pk
+ product_variant | u    | product_variant_option_uq
+ customer_order  | f    | customer_order_customer_fk
+ customer_order  | n    | customer_order_customer_id_nn
+ customer_order  | n    | customer_order_order_id_not_null
+ customer_order  | n    | customer_order_ordered_at_nn
+ customer_order  | p    | customer_order_pk
+ customer_order  | t    | customer_order_has_items_ck
+ order_item      | c    | order_item_quantity_ck
+ order_item      | c    | order_item_unit_price_ck
+ order_item      | f    | order_item_order_fk
+ order_item      | f    | order_item_variant_fk
+ order_item      | n    | order_item_order_id_nn
+ order_item      | n    | order_item_quantity_nn
+ order_item      | n    | order_item_unit_price_nn
+ order_item      | n    | order_item_variant_id_nn
+ order_item      | p    | order_item_pk
+ order_item      | t    | order_item_keeps_order_nonempty_ck
+(51 rows)
+

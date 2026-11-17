@@ -1,0 +1,24 @@
+-- NOT NULL: a customer must have an email.
+-- expect-constraint: customer_email_nn
+-- expect-error: null value in column "email" of relation "customer" violates not-null constraint
+-- EXPECTED: fails with psql exit code 3.
+-- Note: PostgreSQL 18 stores NOT NULL as a named constraint, but its error message does not print
+-- the name (other constraint kinds do). So this script first shows the name from the catalog.
+\echo '--- The named NOT NULL constraint on customer.email (from the catalog)'
+--- The named NOT NULL constraint on customer.email (from the catalog)
+SELECT conname AS constraint_name, contype AS kind, a.attname AS column_name
+FROM pg_constraint k JOIN pg_attribute a ON a.attrelid = k.conrelid AND a.attnum = k.conkey[1]
+WHERE k.conrelid = 'customer'::regclass AND k.contype = 'n' AND a.attname = 'email';
+  constraint_name  | kind | column_name 
+-------------------+------+-------------
+ customer_email_nn | n    | email
+(1 row)
+
+\set VERBOSITY verbose
+INSERT INTO customer (email, full_name) VALUES (NULL, 'No Email');
+psql:/work/sql/violations/v01_not_null_customer_email.sql:12: ERROR:  23502: null value in column "email" of relation "customer" violates not-null constraint
+DETAIL:  Failing row contains (4, null, No Email).
+SCHEMA NAME:  public
+TABLE NAME:  customer
+COLUMN NAME:  email
+LOCATION:  ReportNotNullViolationError, execMain.c:2229

@@ -1,0 +1,95 @@
+=== Part 1: visibility before and after COMMIT ===
+
+[1] Session B: baseline
+    B| SELECT (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:30:00+03') AS amina_orders_1230, (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:45:00+03') AS brian_orders_1245, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Linen Shirt','S','White')) AS shirt_s_white_stock, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Wrap Dress','S','Olive')) AS dress_s_olive_stock;
+    B|  amina_orders_1230 | brian_orders_1245 | shirt_s_white_stock | dress_s_olive_stock 
+    B| -------------------+-------------------+---------------------+---------------------
+    B|                  0 |                 0 |                  10 |                   3
+    B| (1 row)
+    B| 
+
+[2] Session A: BEGIN an order: Amina, 1 x Linen Shirt S White (writes customer_order, order_item, product_variant)
+    A| BEGIN;
+    A| BEGIN
+    A| INSERT INTO customer_order (customer_id, ordered_at) SELECT customer_id, '2026-11-16 12:30:00+03' FROM customer WHERE email = 'amina@example.com' RETURNING order_id AS a_order \gset
+    A| INSERT 0 1
+    A| INSERT INTO order_item (order_id, variant_id, quantity, unit_price) SELECT :a_order, pv.variant_id, 1, p.current_price FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Linen Shirt','S','White');
+    A| INSERT 0 1
+    A| UPDATE product_variant pv SET stock_quantity = pv.stock_quantity - 1 FROM product p, size s, colour c WHERE p.product_id = pv.product_id AND s.size_id = pv.size_id AND c.colour_id = pv.colour_id AND (p.name, s.code, c.name) = ('Linen Shirt','S','White');
+    A| UPDATE 1
+
+[3] Session A: A sees its own uncommitted write
+    A| SELECT (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:30:00+03') AS amina_orders_1230, (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:45:00+03') AS brian_orders_1245, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Linen Shirt','S','White')) AS shirt_s_white_stock, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Wrap Dress','S','Olive')) AS dress_s_olive_stock;
+    A|  amina_orders_1230 | brian_orders_1245 | shirt_s_white_stock | dress_s_olive_stock 
+    A| -------------------+-------------------+---------------------+---------------------
+    A|                  1 |                 0 |                   9 |                   3
+    A| (1 row)
+    A| 
+
+[4] Session B: B BEFORE A commits: must still show the baseline (no order, old stock)
+    B| SELECT (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:30:00+03') AS amina_orders_1230, (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:45:00+03') AS brian_orders_1245, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Linen Shirt','S','White')) AS shirt_s_white_stock, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Wrap Dress','S','Olive')) AS dress_s_olive_stock;
+    B|  amina_orders_1230 | brian_orders_1245 | shirt_s_white_stock | dress_s_olive_stock 
+    B| -------------------+-------------------+---------------------+---------------------
+    B|                  0 |                 0 |                  10 |                   3
+    B| (1 row)
+    B| 
+
+[5] Session A: COMMIT
+    A| COMMIT;
+    A| COMMIT
+
+[6] Session B: B AFTER A commits: order visible and stock reduced, all at once
+    B| SELECT (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:30:00+03') AS amina_orders_1230, (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:45:00+03') AS brian_orders_1245, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Linen Shirt','S','White')) AS shirt_s_white_stock, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Wrap Dress','S','Olive')) AS dress_s_olive_stock;
+    B|  amina_orders_1230 | brian_orders_1245 | shirt_s_white_stock | dress_s_olive_stock 
+    B| -------------------+-------------------+---------------------+---------------------
+    B|                  1 |                 0 |                   9 |                   3
+    B| (1 row)
+    B| 
+
+=== Part 2: a rolled-back write is never visible ===
+
+[7] Session A: BEGIN an order: Brian, 1 x Wrap Dress S Olive
+    A| BEGIN;
+    A| BEGIN
+    A| INSERT INTO customer_order (customer_id, ordered_at) SELECT customer_id, '2026-11-16 12:45:00+03' FROM customer WHERE email = 'brian@example.com' RETURNING order_id AS b_order \gset
+    A| INSERT 0 1
+    A| INSERT INTO order_item (order_id, variant_id, quantity, unit_price) SELECT :b_order, pv.variant_id, 1, p.current_price FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Wrap Dress','S','Olive');
+    A| INSERT 0 1
+    A| UPDATE product_variant pv SET stock_quantity = pv.stock_quantity - 1 FROM product p, size s, colour c WHERE p.product_id = pv.product_id AND s.size_id = pv.size_id AND c.colour_id = pv.colour_id AND (p.name, s.code, c.name) = ('Wrap Dress','S','Olive');
+    A| UPDATE 1
+
+[8] Session A: A sees its own uncommitted write
+    A| SELECT (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:30:00+03') AS amina_orders_1230, (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:45:00+03') AS brian_orders_1245, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Linen Shirt','S','White')) AS shirt_s_white_stock, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Wrap Dress','S','Olive')) AS dress_s_olive_stock;
+    A|  amina_orders_1230 | brian_orders_1245 | shirt_s_white_stock | dress_s_olive_stock 
+    A| -------------------+-------------------+---------------------+---------------------
+    A|                  1 |                 1 |                   9 |                   2
+    A| (1 row)
+    A| 
+
+[9] Session B: B while A's transaction is open: not visible
+    B| SELECT (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:30:00+03') AS amina_orders_1230, (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:45:00+03') AS brian_orders_1245, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Linen Shirt','S','White')) AS shirt_s_white_stock, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Wrap Dress','S','Olive')) AS dress_s_olive_stock;
+    B|  amina_orders_1230 | brian_orders_1245 | shirt_s_white_stock | dress_s_olive_stock 
+    B| -------------------+-------------------+---------------------+---------------------
+    B|                  1 |                 0 |                   9 |                   3
+    B| (1 row)
+    B| 
+
+[10] Session A: ROLLBACK
+    A| ROLLBACK;
+    A| ROLLBACK
+
+[11] Session B: B AFTER A rolls back: nothing changed
+    B| SELECT (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:30:00+03') AS amina_orders_1230, (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:45:00+03') AS brian_orders_1245, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Linen Shirt','S','White')) AS shirt_s_white_stock, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Wrap Dress','S','Olive')) AS dress_s_olive_stock;
+    B|  amina_orders_1230 | brian_orders_1245 | shirt_s_white_stock | dress_s_olive_stock 
+    B| -------------------+-------------------+---------------------+---------------------
+    B|                  1 |                 0 |                   9 |                   3
+    B| (1 row)
+    B| 
+
+[12] Session A: A after ROLLBACK: its own write is gone too
+    A| SELECT (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:30:00+03') AS amina_orders_1230, (SELECT count(*) FROM customer_order WHERE ordered_at = '2026-11-16 12:45:00+03') AS brian_orders_1245, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Linen Shirt','S','White')) AS shirt_s_white_stock, (SELECT stock_quantity FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id) WHERE (p.name, s.code, c.name) = ('Wrap Dress','S','Olive')) AS dress_s_olive_stock;
+    A|  amina_orders_1230 | brian_orders_1245 | shirt_s_white_stock | dress_s_olive_stock 
+    A| -------------------+-------------------+---------------------+---------------------
+    A|                  1 |                 0 |                   9 |                   3
+    A| (1 row)
+    A| 

@@ -1,0 +1,15 @@
+# PostgreSQL 18 with psql 18 inside the container (a host psql may be an older version).
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_PASSWORD: postgres   # local demo only
+    ports:
+      - "55432:5432"
+    volumes:
+      - ./:/work:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 1s
+      timeout: 3s
+      retries: 30

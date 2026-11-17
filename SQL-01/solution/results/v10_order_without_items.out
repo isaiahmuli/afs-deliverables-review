@@ -1,0 +1,13 @@
+-- CONSTRAINT TRIGGER (deferred): an order must contain at least one item; checked at COMMIT.
+-- expect-constraint: customer_order_has_items_ck
+-- EXPECTED: fails with psql exit code 3. Verbose errors print the constraint name.
+\set VERBOSITY verbose
+BEGIN;
+BEGIN
+INSERT INTO customer_order (customer_id, ordered_at) VALUES (3, '2026-11-16 12:00:00+03');
+INSERT 0 1
+COMMIT;
+psql:/work/sql/violations/v10_order_without_items.sql:7: ERROR:  23514: order 4 has no items
+CONTEXT:  PL/pgSQL function customer_order_has_items() line 7 at RAISE
+CONSTRAINT NAME:  customer_order_has_items_ck
+LOCATION:  exec_stmt_raise, pl_exec.c:3925
