@@ -1,0 +1,62 @@
+-- Order history
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT order_id, customer_id, status, created_at
+FROM orders
+WHERE customer_id = 1
+ORDER BY created_at DESC, order_id DESC
+LIMIT 20;
+                                                               QUERY PLAN                                                               
+----------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=13552.90..13555.23 rows=20 width=31) (actual time=22.085..23.923 rows=20.00 loops=1)
+   Buffers: shared hit=464 read=6969
+   ->  Gather Merge  (cost=13552.90..13815.65 rows=2256 width=31) (actual time=22.076..23.911 rows=20.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=464 read=6969
+         ->  Sort  (cost=12552.88..12555.23 rows=940 width=31) (actual time=19.622..19.623 rows=14.67 loops=3)
+               Sort Key: created_at DESC, order_id DESC
+               Sort Method: top-N heapsort  Memory: 27kB
+               Buffers: shared hit=464 read=6969
+               Worker 0:  Sort Method: top-N heapsort  Memory: 27kB
+               Worker 1:  Sort Method: top-N heapsort  Memory: 27kB
+               ->  Parallel Seq Scan on orders  (cost=0.00..12527.86 rows=940 width=31) (actual time=0.244..19.386 rows=666.67 loops=3)
+                     Filter: (customer_id = 1)
+                     Rows Removed by Filter: 331037
+                     Buffers: shared hit=376 read=6969
+ Planning:
+   Buffers: shared hit=85 read=7
+ Planning Time: 0.436 ms
+ Execution Time: 23.981 ms
+(20 rows)
+
+-- Packing queue
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT order_id, customer_id, status, created_at
+FROM orders
+WHERE status = 'PENDING'
+ORDER BY created_at, order_id
+LIMIT 100;
+                                                                QUERY PLAN                                                                
+------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=13855.39..13867.04 rows=100 width=31) (actual time=23.942..25.841 rows=100.00 loops=1)
+   Buffers: shared hit=748 read=6687
+   ->  Gather Merge  (cost=13855.39..16250.64 rows=20566 width=31) (actual time=23.939..25.832 rows=100.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=748 read=6687
+         ->  Sort  (cost=12855.37..12876.79 rows=8569 width=31) (actual time=20.326..20.330 rows=87.00 loops=3)
+               Sort Key: created_at, order_id
+               Sort Method: top-N heapsort  Memory: 32kB
+               Buffers: shared hit=748 read=6687
+               Worker 0:  Sort Method: top-N heapsort  Memory: 32kB
+               Worker 1:  Sort Method: top-N heapsort  Memory: 32kB
+               ->  Parallel Seq Scan on orders  (cost=0.00..12527.86 rows=8569 width=31) (actual time=1.896..19.841 rows=6404.33 loops=3)
+                     Filter: (status = 'PENDING'::text)
+                     Rows Removed by Filter: 325299
+                     Buffers: shared hit=658 read=6687
+ Planning:
+   Buffers: shared hit=17
+ Planning Time: 0.133 ms
+ Execution Time: 25.866 ms
+(20 rows)
+

@@ -1,0 +1,7 @@
+# perf_check.py BEFORE indexes, target 1.9 ms (= lowest baseline median 19.02 ms / 10), 7 runs each
+sql/order_history.sql: median 16.03 ms over 7 runs, target 1.9 ms
+FAIL
+exit code: 1
+sql/packing_queue.sql: median 20.46 ms over 7 runs, target 1.9 ms
+FAIL
+exit code: 1

@@ -1,0 +1,26 @@
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+INSERT 0 100000
+INSERT 0 20
+INSERT 0 2000
+INSERT 0 995110
+INSERT 0 2487775
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+COMMIT
+ANALYZE
+  relation   |  count  
+-------------+---------
+ customers   |  100000
+ categories  |      20
+ products    |    2000
+ orders      |  995110
+ order_items | 2487775
+(5 rows)
+
+seed seconds: 10

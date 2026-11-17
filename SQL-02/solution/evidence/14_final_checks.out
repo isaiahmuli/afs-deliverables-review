@@ -1,0 +1,27 @@
+  relation   |  count  
+-------------+---------
+ customers   |  100000
+ categories  |      20
+ products    |    2000
+ orders      |  995110
+ order_items | 2487775
+(5 rows)
+
+ arrival_orders_left 
+---------------------
+                   0
+(1 row)
+
+ table_name  |         index_name          |                                                          definition                                                          
+-------------+-----------------------------+------------------------------------------------------------------------------------------------------------------------------
+ categories  | categories_pkey             | CREATE UNIQUE INDEX categories_pkey ON public.categories USING btree (category_id)
+ customers   | customers_pkey              | CREATE UNIQUE INDEX customers_pkey ON public.customers USING btree (customer_id)
+ order_items | order_items_pkey            | CREATE UNIQUE INDEX order_items_pkey ON public.order_items USING btree (order_id, item_no)
+ orders      | orders_customer_created_idx | CREATE INDEX orders_customer_created_idx ON public.orders USING btree (customer_id, created_at, order_id)
+ orders      | orders_pending_created_idx  | CREATE INDEX orders_pending_created_idx ON public.orders USING btree (created_at, order_id) WHERE (status = 'PENDING'::text)
+ orders      | orders_pkey                 | CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (order_id)
+ products    | products_pkey               | CREATE UNIQUE INDEX products_pkey ON public.products USING btree (product_id)
+(7 rows)
+
+product_ranks: identical to expected/product_ranks.csv (2001 lines)
+quick_returners: identical to expected/quick_returners.csv (36894 lines)

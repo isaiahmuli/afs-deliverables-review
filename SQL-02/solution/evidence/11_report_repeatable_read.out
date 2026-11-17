@@ -1,0 +1,37 @@
+== Report file: sql/40_report_repeatable_read.sql
+== Isolation line: BEGIN ISOLATION LEVEL REPEATABLE READ;
+21:39:26  A: BEGIN; CREATE TEMP TABLE report_header ... (header totals read now); pg_sleep(30) starts
+21:39:31  B: report_arrival.sql (BEGIN; INSERT order 1000001 + 1 item; COMMIT)
+      B| BEGIN
+      B| INSERT 0 1
+      B| INSERT 0 1
+      B| COMMIT
+      B|  order_id | customer_id | status |     created_at      
+      B| ----------+-------------+--------+---------------------
+      B|   1000001 |           1 | PAID   | 2026-12-20 12:00:00
+      B| (1 row)
+      B| 
+21:39:31  B: committed. A is still paused inside its transaction.
+21:39:56  A: pg_sleep ends; SELECT rows next to the header; COMMIT
+
+== Session A output (column header, first row, last row, footer)
+      A|  order_id | order_revenue | orders_in_rows | revenue_in_rows | orders_in_header | revenue_in_header 
+      A| ----------+---------------+----------------+-----------------+------------------+-------------------
+      A|       483 |       3585.34 |           2000 |      3707644.61 |             2000 |        3707644.61
+      A| ...
+      A|    991607 |       2764.01 |           2000 |      3707644.61 |             2000 |        3707644.61
+      A|    992081 |        299.93 |           2000 |      3707644.61 |             2000 |        3707644.61
+      A| (2000 rows)
+      A| 
+      A| COMMIT
+
+== Header vs rows (first data row of A's output; every row carries the same totals)
+orders_in_rows=2000  orders_in_header=2000
+revenue_in_rows=3707644.61  revenue_in_header=3707644.61
+RESULT: header and rows AGREE
+
+21:39:56  reset: report_reset.sql
+      reset| BEGIN
+      reset| DELETE 1
+      reset| DELETE 1
+      reset| COMMIT

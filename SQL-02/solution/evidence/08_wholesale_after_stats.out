@@ -1,0 +1,7 @@
+-- after pg_stat_statements_reset() and ONE load of /api/wholesale (edited dashboard.py)
+ calls | rows | total_exec_ms | mean_exec_ms |                                                                                                              query                                                                                                              
+-------+------+---------------+--------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+     1 | 4897 |          9.81 |        9.813 | SELECT o.order_id AS wholesale_order_id, i.order_id, i.item_no, i.product_id, i.quantity, i.unit_price FROM orders o LEFT JOIN order_items i ON i.order_id = o.order_id WHERE o.customer_id = $1 ORDER BY o.order_id, i.item_no
+     1 | 4897 |          9.81 |              | == TOTAL statements executed for the panel ==
+(2 rows)
+

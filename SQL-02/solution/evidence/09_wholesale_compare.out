@@ -1,0 +1,8 @@
+order_count: before=2000 after=2000 same
+rows: before=4897 after=4897
+columns (in order): before=['order_id', 'item_no', 'product_id', 'quantity', 'unit_price'] after=['order_id', 'item_no', 'product_id', 'quantity', 'unit_price']
+same row count: yes
+same columns in same order on every row: yes
+same values in same row order: yes
+query_count: before 2001 after 1
+RESULT: IDENTICAL

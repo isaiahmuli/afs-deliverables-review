@@ -1,0 +1,33 @@
+-- Wholesale panel query (edited dashboard.py), customer_id = 1
+                                                                           QUERY PLAN                                                                           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Gather Merge  (cost=20421.25..21073.39 rows=5722 width=34) (actual time=39.067..42.119 rows=4897.00 loops=1)
+   Workers Planned: 1
+   Workers Launched: 1
+   Buffers: shared hit=10071
+   ->  Sort  (cost=19421.24..19429.65 rows=3366 width=34) (actual time=36.133..36.228 rows=2448.50 loops=2)
+         Sort Key: o.order_id, i.item_no
+         Sort Method: quicksort  Memory: 239kB
+         Buffers: shared hit=10071
+         Worker 0:  Sort Method: quicksort  Memory: 222kB
+         ->  Nested Loop Left Join  (cost=66.59..19224.04 rows=3366 width=34) (actual time=0.657..35.052 rows=2448.50 loops=2)
+               Buffers: shared hit=10056
+               ->  Parallel Bitmap Heap Scan on orders o  (cost=66.16..4920.60 rows=1346 width=8) (actual time=0.600..12.502 rows=1000.00 loops=2)
+                     Recheck Cond: (customer_id = 1)
+                     Heap Blocks: exact=1063
+                     Buffers: shared hit=2036
+                     Worker 0:  Heap Blocks: exact=938
+                     ->  Bitmap Index Scan on orders_customer_created_idx  (cost=0.00..65.59 rows=2289 width=0) (actual time=0.823..0.823 rows=2003.00 loops=1)
+                           Index Cond: (customer_id = 1)
+                           Index Searches: 1
+                           Buffers: shared hit=15
+               ->  Index Scan using order_items_pkey on order_items i  (cost=0.43..10.60 rows=3 width=26) (actual time=0.021..0.022 rows=2.45 loops=2000)
+                     Index Cond: (order_id = o.order_id)
+                     Index Searches: 2000
+                     Buffers: shared hit=8020
+ Planning:
+   Buffers: shared hit=212
+ Planning Time: 0.991 ms
+ Execution Time: 42.421 ms
+(28 rows)
+

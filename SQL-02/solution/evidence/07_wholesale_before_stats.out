@@ -1,0 +1,9 @@
+-- after pg_stat_statements_reset() and ONE load of /api/wholesale (original dashboard.py)
+ calls | rows | total_exec_ms | mean_exec_ms |                                                           query                                                            
+-------+------+---------------+--------------+----------------------------------------------------------------------------------------------------------------------------
+  2001 | 6897 |         16.67 |              | == TOTAL statements executed for the panel ==
+  1934 | 4724 |         15.68 |        0.008 | SELECT order_id, item_no, product_id, quantity, unit_price FROM order_items WHERE order_id = $1 ORDER BY order_id, item_no
+    66 |  173 |          0.59 |        0.009 | SELECT order_id, item_no, product_id, quantity, unit_price FROM order_items WHERE order_id = $1 ORDER BY order_id, item_no
+     1 | 2000 |          0.39 |        0.394 | SELECT order_id FROM orders WHERE customer_id = $1 ORDER BY order_id
+(4 rows)
+
