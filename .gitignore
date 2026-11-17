@@ -1,0 +1,23 @@
+# Build output and caches
+build/
+.gradle/
+target/
+__pycache__/
+.pytest_cache/
+.venv/
+*.db
+*.pyc
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Secrets and local agent settings
+.env
+.env.*
+.claude/settings.local.json
+
+# Reviewer reports (private to the reviewer)
+/*/report.md
