@@ -1,0 +1,29 @@
+$ ./gradlew test   # ORIGINAL starter code: pinning test + reproducing Mexico test, before any fix
+> Task :compileJava
+> Task :processResources
+> Task :classes
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+> Task :test
+MexicoTransferTest > twoHundredDollarsToMexico() FAILED
+    java.lang.IllegalStateException: Could not price transfer T0005
+        at transfers.TransferFeeBatch.price(TransferFeeBatch.java:92)
+        at transfers.MexicoTransferTest.twoHundredDollarsToMexico(MexicoTransferTest.java:17)
+        Caused by:
+        java.lang.NullPointerException: Cannot read field "scale" because "multiplicand" is null
+            at java.base/java.math.BigDecimal.multiply(BigDecimal.java:1602)
+            at transfers.TransferFeeBatch.convert(TransferFeeBatch.java:97)
+            at transfers.TransferFeeBatch.price(TransferFeeBatch.java:88)
+            ... 1 more
+PinnedResultsTest > everyOriginallyPricedRowIsUnchanged() PASSED
+2 tests completed, 1 failed
+> Task :test FAILED
+FAILURE: Build failed with an exception.
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///Users/isaiahmuli/visual%20studio%20projects/afs-30-nov-cohort/deliverables%20review/JAVA-03/solution/transfer-fee-batch/build/reports/tests/test/index.html
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+BUILD FAILED in 12s
+4 actionable tasks: 4 executed

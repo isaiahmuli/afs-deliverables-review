@@ -1,0 +1,48 @@
+INFO [main] t.rates.BankRates - Fetching bank rates, fetch 1
+WARN [main] t.r.ReceiptListenerFactory - Receipts are OFF: no texts will be sent
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0006 USD 6000.00
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0106 USD 6000.00
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0008 USD 5000.01
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0056 USD 6000.00
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0156 USD 6000.00
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0108 USD 5000.01
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0058 USD 5000.01
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0158 USD 5000.01
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0016 USD 6000.00
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0066 USD 6000.00
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0116 USD 6000.00
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0068 USD 5000.01
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0018 USD 5000.01
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0166 USD 6000.00
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0118 USD 5000.01
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0168 USD 5000.01
+WARN [pool-1-thread-2] t.batch.TransferFeeBatch - Refused transfer T0070 type=intl: unsupported type
+WARN [pool-1-thread-4] t.batch.TransferFeeBatch - Refused transfer T0170 type=intl: unsupported type
+WARN [pool-1-thread-3] t.batch.TransferFeeBatch - Refused transfer T0120 type=intl: unsupported type
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0176 USD 6000.00
+WARN [pool-1-thread-1] t.batch.TransferFeeBatch - Refused transfer T0020 type=intl: unsupported type
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0126 USD 6000.00
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0178 USD 5000.01
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0076 USD 6000.00
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0128 USD 5000.01
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0026 USD 6000.00
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0186 USD 6000.00
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0078 USD 5000.01
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0028 USD 5000.01
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0188 USD 5000.01
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0136 USD 6000.00
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0138 USD 5000.01
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0196 USD 6000.00
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0036 USD 6000.00
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0086 USD 6000.00
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0038 USD 5000.01
+WARN [pool-1-thread-4] t.r.ReviewFlagListener - REVIEW T0198 USD 5000.01
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0146 USD 6000.00
+WARN [pool-1-thread-3] t.r.ReviewFlagListener - REVIEW T0148 USD 5000.01
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0088 USD 5000.01
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0046 USD 6000.00
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0096 USD 6000.00
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW T0048 USD 5000.01
+WARN [pool-1-thread-2] t.r.ReviewFlagListener - REVIEW T0098 USD 5000.01
+INFO [main] t.batch.TransferFeeBatch - Fees written to build/check/fees-receipts-off.csv
+INFO [main] transfers.Main - Read=200 priced=196 refused=4 rate fetches=1 SMS receipts=0 review flags=40
