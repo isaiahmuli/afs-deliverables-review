@@ -1,0 +1,21 @@
+$ ./gradlew compileJava   # Delivery.Pickup added to the sealed interface; deliveryCents() switch NOT updated yet
+> Task :compileJava FAILED
+src/main/java/boutique/ShoppingBasket.java:71: error: the switch expression does not cover all possible input values
+        return switch (delivery) {
+               ^
+1 error
+[Incubating] Problems report is available at: file://build/reports/problems/problems-report.html
+FAILURE: Build failed with an exception.
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  src/main/java/boutique/ShoppingBasket.java:71: error: the switch expression does not cover all possible input values
+          return switch (delivery) {
+                 ^
+  1 error
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+BUILD FAILED in 593ms
+1 actionable task: 1 executed
+(build failed: exit code 1)

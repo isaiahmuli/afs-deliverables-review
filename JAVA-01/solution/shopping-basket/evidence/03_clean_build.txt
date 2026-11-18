@@ -1,0 +1,18 @@
+$ ./gradlew clean build   # fresh copy of the project: no build/ or .gradle/ folders
+> Task :clean UP-TO-DATE
+> Task :compileJava
+> Task :processResources NO-SOURCE
+> Task :classes
+> Task :jar
+> Task :startScripts
+> Task :distTar
+> Task :distZip
+> Task :assemble
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+> Task :test
+> Task :check
+> Task :build
+BUILD SUCCESSFUL in 1s
+8 actionable tasks: 7 executed, 1 up-to-date
