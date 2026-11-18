@@ -1,0 +1,10 @@
+$ ./gradlew run --args=evidence/sample-run
+Jackets available: 60
+Shoppers: 200
+Reservations accepted: 60
+Jackets left: 0
+Checkout errors: 0
+Manifest lines after close: 60
+Audit lines after close: 61
+Manifest: evidence/sample-run/manifest.csv
+Audit log: evidence/sample-run/audit.csv

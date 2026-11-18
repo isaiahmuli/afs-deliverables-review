@@ -1,0 +1,85 @@
+$ ./gradlew test --tests boutique.ConcurrentSaleTest --tests boutique.ConcurrentManifestFileTest   # FIXED code
+> Task :cleanTest
+> Task :compileJava UP-TO-DATE
+> Task :processResources NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+
+> Task :test
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 1 of 10 PASSED
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 2 of 10 PASSED
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 3 of 10 PASSED
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 4 of 10 PASSED
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 5 of 10 PASSED
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 6 of 10 PASSED
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 7 of 10 PASSED
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 8 of 10 PASSED
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 9 of 10 PASSED
+
+ConcurrentManifestFileTest > everyAcceptedOrderIsOneCompleteManifestLineAndRefusedOrdersAreAbsent() > repetition 10 of 10 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 1 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 2 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 3 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 4 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 5 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 6 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 7 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 8 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 9 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 10 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 11 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 12 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 13 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 14 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 15 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 16 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 17 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 18 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 19 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 20 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 21 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 22 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 23 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 24 of 25 PASSED
+
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 25 of 25 PASSED
+
+> Task :jacocoTestReport
+
+BUILD SUCCESSFUL in 2s
+5 actionable tasks: 3 executed, 2 up-to-date

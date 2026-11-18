@@ -1,0 +1,12 @@
+JaCoCo 0.8.16, main source set (full report: evidence/jacoco-html/index.html)
+TOTAL line coverage: 140/149 lines = 94.0%  (rule: at least 80%, enforced by ./gradlew check)
+  AsyncFileWriter.java     32/37 lines = 86.5%
+  AuditEvent.java          8/8 lines = 100.0%
+  Checkout.java            36/36 lines = 100.0%
+  CsvRecord.java           no executable lines
+  FileManifestWriter.java  2/2 lines = 100.0%
+  Main.java                35/39 lines = 89.7%
+  ManifestWriter.java      no executable lines
+  Order.java               4/4 lines = 100.0%
+  Product.java             22/22 lines = 100.0%
+  RecordWriter.java        1/1 lines = 100.0%
