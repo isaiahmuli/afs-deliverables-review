@@ -1,0 +1,11 @@
+-- CHECK: stock cannot go below zero.
+-- expect-constraint: product_variant_stock_quantity_ck
+-- EXPECTED: fails with psql exit code 3. Verbose errors print the constraint name.
+\set VERBOSITY verbose
+UPDATE product_variant SET stock_quantity = -1 WHERE variant_id = 1;
+psql:/work/sql/violations/v04_check_negative_stock.sql:5: ERROR:  23514: new row for relation "product_variant" violates check constraint "product_variant_stock_quantity_ck"
+DETAIL:  Failing row contains (1, 1, 1, 1, -1).
+SCHEMA NAME:  public
+TABLE NAME:  product_variant
+CONSTRAINT NAME:  product_variant_stock_quantity_ck
+LOCATION:  ExecConstraints, execMain.c:2092

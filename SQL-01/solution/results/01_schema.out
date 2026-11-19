@@ -1,0 +1,120 @@
+-- 01_schema.sql: boutique order system schema (PostgreSQL 18).
+-- Run on an EMPTY database:  psql -X -v ON_ERROR_STOP=1 -f sql/01_schema.sql
+--
+-- Naming: constraints are named <table>_<column(s)>_<kind> so errors say exactly which rule failed.
+--   kinds: pk primary key, fk foreign key, uq unique, ck check, nn not null
+--   (PostgreSQL 18 stores NOT NULL as a named constraint, so it can be named like the others).
+-- Money: numeric(19,2) only.
+BEGIN;
+BEGIN
+-- Customers -------------------------------------------------------------------------------
+CREATE TABLE customer (
+    customer_id  integer GENERATED ALWAYS AS IDENTITY,
+    email        text CONSTRAINT customer_email_nn NOT NULL,
+    full_name    text CONSTRAINT customer_full_name_nn NOT NULL,
+    CONSTRAINT customer_pk             PRIMARY KEY (customer_id),
+    CONSTRAINT customer_email_uq       UNIQUE (email),
+    -- Store emails in lower case so 'Amina@x.com' and 'amina@x.com' cannot both exist.
+    CONSTRAINT customer_email_lower_ck CHECK (email = lower(email)),
+    CONSTRAINT customer_email_format_ck CHECK (email LIKE '_%@_%._%'),
+    CONSTRAINT customer_full_name_ck   CHECK (btrim(full_name) <> '')
+);
+CREATE TABLE
+-- Catalogue ---------------------------------------------------------------------------------
+CREATE TABLE product (
+    product_id     integer GENERATED ALWAYS AS IDENTITY,
+    name           text CONSTRAINT product_name_nn NOT NULL,
+    current_price  numeric(19,2) CONSTRAINT product_current_price_nn NOT NULL,
+    CONSTRAINT product_pk               PRIMARY KEY (product_id),
+    CONSTRAINT product_name_uq          UNIQUE (name),
+    CONSTRAINT product_current_price_ck CHECK (current_price > 0)
+);
+CREATE TABLE
+CREATE TABLE size (
+    size_id     integer GENERATED ALWAYS AS IDENTITY,
+    code        text CONSTRAINT size_code_nn NOT NULL,          -- e.g. 'S', 'M', 'L'
+    sort_order  smallint CONSTRAINT size_sort_order_nn NOT NULL,      -- display order: S before M before L
+    CONSTRAINT size_pk            PRIMARY KEY (size_id),
+    CONSTRAINT size_code_uq       UNIQUE (code),
+    CONSTRAINT size_sort_order_uq UNIQUE (sort_order)
+);
+CREATE TABLE
+CREATE TABLE colour (
+    colour_id  integer GENERATED ALWAYS AS IDENTITY,
+    name       text CONSTRAINT colour_name_nn NOT NULL,
+    CONSTRAINT colour_pk      PRIMARY KEY (colour_id),
+    CONSTRAINT colour_name_uq UNIQUE (name)
+);
+CREATE TABLE
+-- One sellable option: a product in one size and one colour. Stock lives here because
+-- it depends on the whole option, not on the product alone.
+CREATE TABLE product_variant (
+    variant_id      integer GENERATED ALWAYS AS IDENTITY,
+    product_id      integer CONSTRAINT product_variant_product_id_nn NOT NULL,
+    size_id         integer CONSTRAINT product_variant_size_id_nn NOT NULL,
+    colour_id       integer CONSTRAINT product_variant_colour_id_nn NOT NULL,
+    stock_quantity  integer CONSTRAINT product_variant_stock_quantity_nn NOT NULL,
+    CONSTRAINT product_variant_pk                 PRIMARY KEY (variant_id),
+    CONSTRAINT product_variant_option_uq          UNIQUE (product_id, size_id, colour_id),
+    CONSTRAINT product_variant_stock_quantity_ck  CHECK (stock_quantity >= 0),
+    -- Catalogue rows cannot be deleted while options use them; retire them instead.
+    CONSTRAINT product_variant_product_fk FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE RESTRICT,
+    CONSTRAINT product_variant_size_fk    FOREIGN KEY (size_id)    REFERENCES size (size_id)       ON DELETE RESTRICT,
+    CONSTRAINT product_variant_colour_fk  FOREIGN KEY (colour_id)  REFERENCES colour (colour_id)   ON DELETE RESTRICT
+);
+CREATE TABLE
+-- Orders ------------------------------------------------------------------------------------
+-- "order" is a reserved word, hence customer_order.
+CREATE TABLE customer_order (
+    order_id     integer GENERATED ALWAYS AS IDENTITY,
+    customer_id  integer CONSTRAINT customer_order_customer_id_nn NOT NULL,
+    ordered_at   timestamptz CONSTRAINT customer_order_ordered_at_nn NOT NULL,
+    CONSTRAINT customer_order_pk          PRIMARY KEY (order_id),
+    -- Orders are business records: a customer with orders cannot be deleted.
+    CONSTRAINT customer_order_customer_fk FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT
+);
+CREATE TABLE
+-- unit_price is the price PAID, copied from product.current_price when the order is placed.
+-- It is a fact about this order line, not a copy of the current price, so it is not a 3NF violation.
+CREATE TABLE order_item (
+    order_id    integer CONSTRAINT order_item_order_id_nn NOT NULL,
+    variant_id  integer CONSTRAINT order_item_variant_id_nn NOT NULL,
+    quantity    integer CONSTRAINT order_item_quantity_nn NOT NULL,
+    unit_price  numeric(19,2) CONSTRAINT order_item_unit_price_nn NOT NULL,
+    CONSTRAINT order_item_pk            PRIMARY KEY (order_id, variant_id),
+    CONSTRAINT order_item_quantity_ck   CHECK (quantity > 0),
+    CONSTRAINT order_item_unit_price_ck CHECK (unit_price > 0),
+    -- Items are part of their order: deleting an order removes its items.
+    CONSTRAINT order_item_order_fk   FOREIGN KEY (order_id)   REFERENCES customer_order (order_id)    ON DELETE CASCADE,
+    -- Sold options must stay for order history.
+    CONSTRAINT order_item_variant_fk FOREIGN KEY (variant_id) REFERENCES product_variant (variant_id) ON DELETE RESTRICT
+);
+CREATE TABLE
+-- "Each order contains one or more items." Keys and CHECKs cannot express this, so a
+-- deferred constraint trigger checks it at COMMIT, after all items of the order are inserted.
+CREATE FUNCTION customer_order_has_items() RETURNS trigger
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_order_id integer := CASE WHEN TG_TABLE_NAME = 'customer_order' THEN NEW.order_id ELSE OLD.order_id END;
+BEGIN
+    IF EXISTS (SELECT 1 FROM customer_order WHERE order_id = v_order_id)
+       AND NOT EXISTS (SELECT 1 FROM order_item WHERE order_id = v_order_id) THEN
+        RAISE EXCEPTION 'order % has no items', v_order_id
+            USING ERRCODE = 'check_violation', CONSTRAINT = 'customer_order_has_items_ck';
+    END IF;
+    RETURN NULL;
+END;
+$$;
+CREATE FUNCTION
+CREATE CONSTRAINT TRIGGER customer_order_has_items_ck
+    AFTER INSERT ON customer_order
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW EXECUTE FUNCTION customer_order_has_items();
+CREATE TRIGGER
+CREATE CONSTRAINT TRIGGER order_item_keeps_order_nonempty_ck
+    AFTER DELETE OR UPDATE OF order_id ON order_item
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW EXECUTE FUNCTION customer_order_has_items();
+CREATE TRIGGER
+COMMIT;
+COMMIT

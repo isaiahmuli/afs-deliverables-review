@@ -1,0 +1,27 @@
+-- 07_verify_after_orders.sql: run in a NEW session after 05 and 06.
+-- Proves the successful order is complete and the failed one left nothing behind.
+SET TIME ZONE 'Africa/Nairobi';
+
+\echo '--- All orders: 1-3 seed, 4 = Chloe (05). Brian''s oversell order (06) is absent.'
+SELECT o.order_id, cu.email, to_char(o.ordered_at, 'YYYY-MM-DD HH24:MI') AS ordered_at,
+       count(oi.*) AS items, sum(oi.quantity) AS units
+FROM customer_order o JOIN customer cu USING (customer_id) LEFT JOIN order_item oi USING (order_id)
+GROUP BY o.order_id, cu.email ORDER BY o.order_id;
+
+\echo '--- Orders placed on 2026-11-16 (the two attempts): only Chloe''s'
+SELECT o.order_id, cu.email FROM customer_order o JOIN customer cu USING (customer_id)
+WHERE o.ordered_at >= '2026-11-16 00:00+03' ORDER BY o.order_id;
+
+\echo '--- Order items that point to a missing order (must be 0 rows)'
+SELECT oi.* FROM order_item oi LEFT JOIN customer_order o USING (order_id) WHERE o.order_id IS NULL;
+
+\echo '--- Stock of every option touched by 05 and 06'
+SELECT p.name, s.code AS size, c.name AS colour, pv.stock_quantity
+FROM product_variant pv JOIN product p USING (product_id) JOIN size s USING (size_id) JOIN colour c USING (colour_id)
+WHERE (p.name, s.code, c.name) IN (('Linen Shirt','M','White'), ('Wrap Dress','M','Olive'), ('Denim Jacket','L','Navy'))
+ORDER BY p.name, s.sort_order, c.name;
+-- Expected stock: Denim Jacket L Navy 4 (unchanged), Linen Shirt M White 0 (2-2), Wrap Dress M Olive 7 (8-1, the
+-- oversell's -1 on this option was rolled back).
+
+\echo '--- Note: order_id 5 was used by the rolled-back attempt. Identity values are not rolled back,'
+\echo '--- so the next successful order gets 6. Gaps in IDs are normal and are not lost data.'

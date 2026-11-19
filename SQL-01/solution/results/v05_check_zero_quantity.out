@@ -1,0 +1,11 @@
+-- CHECK: an order item quantity must be greater than zero.
+-- expect-constraint: order_item_quantity_ck
+-- EXPECTED: fails with psql exit code 3. Verbose errors print the constraint name.
+\set VERBOSITY verbose
+INSERT INTO order_item (order_id, variant_id, quantity, unit_price) VALUES (2, 1, 0, 49.00);
+psql:/work/sql/violations/v05_check_zero_quantity.sql:5: ERROR:  23514: new row for relation "order_item" violates check constraint "order_item_quantity_ck"
+DETAIL:  Failing row contains (2, 1, 0, 49.00).
+SCHEMA NAME:  public
+TABLE NAME:  order_item
+CONSTRAINT NAME:  order_item_quantity_ck
+LOCATION:  ExecConstraints, execMain.c:2092

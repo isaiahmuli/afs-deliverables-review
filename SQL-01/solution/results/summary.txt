@@ -1,0 +1,24 @@
+PASS  01_schema exits 0
+PASS  02_seed exits 0
+PASS  every table has a primary key
+PASS  03_queries exits 0
+PASS  q1_customer_orders matches expected/q1_customer_orders.csv
+PASS  q2_low_stock matches expected/q2_low_stock.csv
+PASS  q3_customer_order_counts matches expected/q3_customer_order_counts.csv
+PASS  v01_not_null_customer_email rejected by customer_email_nn
+PASS  v02_unique_customer_email rejected by customer_email_uq
+PASS  v03_check_customer_email_lower rejected by customer_email_lower_ck
+PASS  v04_check_negative_stock rejected by product_variant_stock_quantity_ck
+PASS  v05_check_zero_quantity rejected by order_item_quantity_ck
+PASS  v06_check_zero_product_price rejected by product_current_price_ck
+PASS  v07_check_negative_unit_price rejected by order_item_unit_price_ck
+PASS  v08_fk_unknown_variant rejected by order_item_variant_fk
+PASS  v09_fk_restrict_delete_customer rejected by customer_order_customer_fk
+PASS  v10_order_without_items rejected by customer_order_has_items_ck
+PASS  04_price_history exits 0
+PASS  05_order_success exits 0
+PASS  06_order_oversell exits 3
+PASS  06 oversell rejected by product_variant_stock_quantity_ck
+PASS  07_verify_after_orders exits 0
+PASS  08 two-session demo ran
+23 passed, 0 failed

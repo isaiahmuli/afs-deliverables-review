@@ -1,0 +1,4 @@
+order_id,ordered_at,product,size,colour,quantity,price_paid
+1,2026-10-01 10:15,Linen Shirt,S,White,2,45.00
+1,2026-10-01 10:15,Wrap Dress,S,Olive,1,75.50
+3,2026-11-02 09:30,Linen Shirt,M,Navy,1,49.00

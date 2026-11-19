@@ -1,0 +1,11 @@
+-- FOREIGN KEY (ON DELETE RESTRICT): a customer with orders cannot be deleted.
+-- expect-constraint: customer_order_customer_fk
+-- EXPECTED: fails with psql exit code 3. Verbose errors print the constraint name.
+\set VERBOSITY verbose
+DELETE FROM customer WHERE email = 'brian@example.com';
+psql:/work/sql/violations/v09_fk_restrict_delete_customer.sql:5: ERROR:  23001: update or delete on table "customer" violates RESTRICT setting of foreign key constraint "customer_order_customer_fk" on table "customer_order"
+DETAIL:  Key (customer_id)=(2) is referenced from table "customer_order".
+SCHEMA NAME:  public
+TABLE NAME:  customer_order
+CONSTRAINT NAME:  customer_order_customer_fk
+LOCATION:  ri_ReportViolation, ri_triggers.c:2839
