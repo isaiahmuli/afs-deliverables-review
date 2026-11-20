@@ -1,0 +1,6 @@
+id,type,sender,amount_usd,recipient_currency
+B0001,bill,sender-0201,120.00,USD
+B0002,bill,sender-0202,5200.00,USD
+B0003,friend,sender-0203,25.00,USD
+B0004,international,sender-0204,200.00,MXN
+B0005,intl,sender-0205,40.00,EUR

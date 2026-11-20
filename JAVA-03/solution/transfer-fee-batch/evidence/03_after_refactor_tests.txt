@@ -1,0 +1,13 @@
+$ ./gradlew test   # after restructuring into packages: the same pinning test, unchanged, still passes
+> Task :cleanTest
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+> Task :test
+MexicoTransferTest > twoHundredDollarsToMexico() PASSED
+PinnedResultsTest > everyOriginallyPricedRowIsUnchanged() PASSED
+BUILD SUCCESSFUL in 1s
+5 actionable tasks: 2 executed, 3 up-to-date

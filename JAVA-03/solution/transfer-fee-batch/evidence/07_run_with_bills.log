@@ -1,0 +1,5 @@
+INFO [main] t.rates.BankRates - Fetching bank rates, fetch 1
+WARN [pool-1-thread-3] t.batch.TransferFeeBatch - Refused transfer B0005 type=intl: unsupported type
+WARN [pool-1-thread-1] t.r.ReviewFlagListener - REVIEW B0002 USD 5200.00
+INFO [main] t.batch.TransferFeeBatch - Fees written to evidence/sample-output/fees-with-bills.csv
+INFO [main] transfers.Main - Read=5 priced=4 refused=1 rate fetches=1 SMS receipts=4 review flags=1

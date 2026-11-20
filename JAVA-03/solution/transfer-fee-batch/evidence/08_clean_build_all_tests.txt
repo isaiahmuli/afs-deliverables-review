@@ -1,0 +1,147 @@
+$ ./gradlew clean build   # fresh copy: no build/ or .gradle/ folders
+> Task :clean UP-TO-DATE
+> Task :compileJava
+> Task :processResources
+> Task :classes
+> Task :jar
+> Task :startScripts
+> Task :distTar
+> Task :distZip
+> Task :assemble
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+
+> Task :test
+
+ArchitectureTest > packagesAreFreeOfCycles PASSED
+
+ArchitectureTest > coreDependsOnNoOtherProjectPackage PASSED
+
+ArchitectureTest > noStandardStreams PASSED
+
+MexicoTransferTest > twoHundredDollarsToMexico() PASSED
+
+PinnedResultsTest > everyOriginallyPricedRowIsUnchanged() PASSED
+
+TransferFeeBatchTest > refusedRowsDoNotStopTheBatch() PASSED
+
+TransferFeeBatchTest > receiptsOnTextsEveryPricedTransfer() PASSED
+
+TransferFeeBatchTest > receiptsOffSendsNoTextsButStillPricesAndFlags() PASSED
+
+FeeCalculatorTest > invalidTransfersAreRejected() PASSED
+
+FeeCalculatorTest > theContextGainsANewStrategyWithNoChange() PASSED
+
+FeeCalculatorTest > twoRulesForOneTypeAreRejected() PASSED
+
+FeeCalculatorTest > unsupportedTypesAreRefusedWithRowIdAndType() PASSED
+
+FeeCalculatorTest > domesticTransfersNeverAskForARate() PASSED
+
+FeeCalculatorTest > aMissingRateIsAClearErrorNotANullPointer() PASSED
+
+FeeRulesTest > feesAndRecipientAmounts(String, String, String, String, String, String) > friend USD 25.00 -> fee 0.00, recipient 25.00 USD PASSED
+
+FeeRulesTest > feesAndRecipientAmounts(String, String, String, String, String, String) > bank USD 80.00 -> fee 0.50, recipient 80.00 USD PASSED
+
+FeeRulesTest > feesAndRecipientAmounts(String, String, String, String, String, String) > bill USD 120.00 -> fee 0.25, recipient 120.00 USD PASSED
+
+FeeRulesTest > feesAndRecipientAmounts(String, String, String, String, String, String) > international USD 100.00 -> fee 3.00, recipient 92.00 EUR PASSED
+
+FeeRulesTest > feesAndRecipientAmounts(String, String, String, String, String, String) > international USD 150.00 -> fee 3.00, recipient 138.00 EUR PASSED
+
+FeeRulesTest > feesAndRecipientAmounts(String, String, String, String, String, String) > international USD 150.25 -> fee 3.01, recipient 138.23 EUR PASSED
+
+FeeRulesTest > feesAndRecipientAmounts(String, String, String, String, String, String) > international USD 500.00 -> fee 10.00, recipient 460.00 EUR PASSED
+
+FeeRulesTest > feesAndRecipientAmounts(String, String, String, String, String, String) > international USD 200.00 -> fee 4.00, recipient 3450.00 MXN PASSED
+
+FeeRulesTest > feesAndRecipientAmounts(String, String, String, String, String, String) > international USD 0.01 -> fee 3.00, recipient 0.17 MXN PASSED
+
+PricingEventsTest > aFailingObserverDoesNotStopTheOthers() PASSED
+
+PricingEventsTest > subscribedObserversAreNotifiedAndUnsubscribedOnesAreNot() PASSED
+
+BankRatesSingletonTest > aSecondRatesFileInOneNightIsRejected() PASSED
+
+BankRatesSingletonTest > everyCurrencyInTheFileIsLoadedIncludingMexico() PASSED
+
+BankRatesSingletonTest > laterCallsReuseTonightsTable() PASSED
+
+BankRatesSingletonTest > aMissingFileFailsClearly() PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 1 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 2 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 3 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 4 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 5 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 6 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 7 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 8 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 9 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 10 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 11 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 12 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 13 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 14 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 15 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 16 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 17 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 18 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 19 of 20 PASSED
+
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 20 of 20 PASSED
+
+ReceiptListenerFactoryTest > notSetMeansOn() PASSED
+
+ReceiptListenerFactoryTest > theReceiptShowsAmountFeeAndWhatTheRecipientReceives() PASSED
+
+ReceiptListenerFactoryTest > anythingElseIsRejected(String) > [1]  PASSED
+
+ReceiptListenerFactoryTest > anythingElseIsRejected(String) > [2]    PASSED
+
+ReceiptListenerFactoryTest > anythingElseIsRejected(String) > [3] maybe PASSED
+
+ReceiptListenerFactoryTest > anythingElseIsRejected(String) > [4] false PASSED
+
+ReceiptListenerFactoryTest > anythingElseIsRejected(String) > [5] 0 PASSED
+
+ReceiptListenerFactoryTest > offReturnsNoListener(String) > [1] off PASSED
+
+ReceiptListenerFactoryTest > offReturnsNoListener(String) > [2] OFF PASSED
+
+ReceiptListenerFactoryTest > offReturnsNoListener(String) > [3]  Off PASSED
+
+ReceiptListenerFactoryTest > onReturnsTheSmsReceiptListener(String) > [1] on PASSED
+
+ReceiptListenerFactoryTest > onReturnsTheSmsReceiptListener(String) > [2] ON PASSED
+
+ReceiptListenerFactoryTest > onReturnsTheSmsReceiptListener(String) > [3]  on  PASSED
+
+ReviewFlagListenerTest > onlyTransfersAboveFiveThousandAreFlagged() PASSED
+
+> Task :check
+> Task :build
+
+BUILD SUCCESSFUL in 3s
+9 actionable tasks: 8 executed, 1 up-to-date

@@ -1,0 +1,12 @@
+$ ./gradlew test   # after the one-line root-cause fix (load every currency in the rates file), before any restructuring
+> Task :compileJava
+> Task :processResources UP-TO-DATE
+> Task :classes
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+> Task :test
+MexicoTransferTest > twoHundredDollarsToMexico() PASSED
+PinnedResultsTest > everyOriginallyPricedRowIsUnchanged() PASSED
+BUILD SUCCESSFUL in 1s
+4 actionable tasks: 2 executed, 2 up-to-date

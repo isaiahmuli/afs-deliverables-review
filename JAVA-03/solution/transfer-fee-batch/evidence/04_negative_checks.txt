@@ -1,0 +1,56 @@
+# Negative check (scratch copy, not part of the solution): the tests catch the problems they guard against.
+# 1) core/BadDependency.java added: a core class that uses transfers.events.PricingEvents
+# 2) BankRates.getInstance reverted to the original unsafe lazy init: if (instance == null) instance = new ...
+$ ./gradlew test --tests transfers.ArchitectureTest --tests transfers.rates.BankRatesSingletonTest
+ArchitectureTest > packagesAreFreeOfCycles FAILED
+    java.lang.AssertionError: Architecture Violation [Priority: MEDIUM] - Rule 'slices matching 'transfers.(*)..' should be free of cycles' was violated (1 times):
+ArchitectureTest > coreDependsOnNoOtherProjectPackage FAILED
+    java.lang.AssertionError: Architecture Violation [Priority: MEDIUM] - Rule 'classes that reside in a package 'transfers.core..' should only depend on classes that reside in any package ['transfers.core..', 'java..']' was violated (1 times):
+ArchitectureTest > noStandardStreams PASSED
+BankRatesSingletonTest > aSecondRatesFileInOneNightIsRejected() FAILED
+BankRatesSingletonTest > everyCurrencyInTheFileIsLoadedIncludingMexico() PASSED
+BankRatesSingletonTest > laterCallsReuseTonightsTable() PASSED
+BankRatesSingletonTest > aMissingFileFailsClearly() PASSED
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 1 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <31>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 2 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 3 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <31>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 4 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 5 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 6 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 7 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 8 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 9 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <31>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 10 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 11 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 12 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <31>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 13 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 14 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 15 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 16 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 17 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 18 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <32>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 19 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <31>
+BankRatesSingletonTest > manyThreadsAtOnceGetOneInstanceAndOneFetch() > repetition 20 of 20 FAILED
+    org.opentest4j.AssertionFailedError: distinct instances ==> expected: <1> but was: <31>
+27 tests completed, 23 failed
+> Task :test FAILED
+BUILD FAILED in 2s
