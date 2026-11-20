@@ -1,0 +1,21 @@
+$ diff -u starter/src/test/java/boutique/ShoppingBasketTest.java solution/src/test/java/boutique/ShoppingBasketTest.java
+--- ../../java01_d01_starter/src/test/java/boutique/ShoppingBasketTest.java	2026-11-17 23:22:09
++++ src/test/java/boutique/ShoppingBasketTest.java	2026-11-17 23:28:56
+@@ -26,7 +26,7 @@
+     void standardDeliveryCostsFiveDollars() throws Exception {
+         var basket = basket();
+         basket.add("AB-12", 1);
+-        basket.setDelivery("STANDARD");
++        basket.setDelivery(Delivery.STANDARD);
+         assertEquals(500, basket.deliveryCents());
+         assertEquals(3000, basket.checkoutTotalCents());
+     }
+@@ -35,7 +35,7 @@
+     void expressDeliveryCostsTwelveDollars() throws Exception {
+         var basket = basket();
+         basket.add("AB-12", 1);
+-        basket.setDelivery("EXPRESS");
++        basket.setDelivery(Delivery.EXPRESS);
+         assertEquals(1200, basket.deliveryCents());
+         assertEquals(3700, basket.checkoutTotalCents());
+     }

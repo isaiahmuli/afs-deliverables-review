@@ -1,0 +1,8 @@
+$ ./gradlew run -q
+BOUTIQUE RECEIPT
+AB-12 | Shirt | quantity 2 | $50.00
+cap-7 | Cap | quantity 1 | $18.00
+Items: $68.00
+After discount: $61.20
+Delivery: $5.00
+Total: $66.20
