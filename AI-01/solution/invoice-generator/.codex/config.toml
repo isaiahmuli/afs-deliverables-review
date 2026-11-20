@@ -1,0 +1,4 @@
+# Project-scoped Codex config. Public MCP source; no credentials are stored here.
+# See docs/MCP.md for when agents should consult it.
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
