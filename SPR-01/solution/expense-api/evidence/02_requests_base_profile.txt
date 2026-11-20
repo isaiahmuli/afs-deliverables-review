@@ -1,0 +1,133 @@
+### POST /api/expenses
+{"employee":"Amina Otieno","description":"Fuel for client visit (business share of $120 receipt)","expenseDate":"2026-11-18","receiptTotal":120.00,"claimAmount":50.00}
+--- response
+HTTP/1.1 201 
+Location: /api/expenses/1
+Content-Type: application/json
+
+{"id":1,"employee":"Amina Otieno","description":"Fuel for client visit (business share of $120 receipt)","expenseDate":"2026-11-18","receiptTotal":120.00,"claimAmount":50.00,"currency":"USD","submittedAt":"2026-11-19T21:52:03.778492Z"}
+
+
+### GET /api/expenses/1
+--- response
+HTTP/1.1 200 
+Content-Type: application/json
+Content-Length: 235
+
+{"id":1,"employee":"Amina Otieno","description":"Fuel for client visit (business share of $120 receipt)","expenseDate":"2026-11-18","receiptTotal":120.00,"claimAmount":50.00,"currency":"USD","submittedAt":"2026-11-19T21:52:03.778492Z"}
+
+
+### GET /api/expenses
+--- response
+HTTP/1.1 200 
+Content-Type: application/json
+Content-Length: 237
+
+[{"id":1,"employee":"Amina Otieno","description":"Fuel for client visit (business share of $120 receipt)","expenseDate":"2026-11-18","receiptTotal":120.00,"claimAmount":50.00,"currency":"USD","submittedAt":"2026-11-19T21:52:03.778492Z"}]
+
+
+### GET /api/expenses/999
+--- response
+HTTP/1.1 404 
+Content-Type: application/problem+json
+
+{"detail":"No expense with id 999.","instance":"/api/expenses/999","status":404,"title":"Expense not found","id":999}
+
+
+### POST /api/expenses
+{}
+--- response
+HTTP/1.1 400 
+Content-Type: application/problem+json
+
+{"detail":"5 fields need correcting.","instance":"/api/expenses","status":400,"title":"Invalid expense submission","errors":[{"field":"claimAmount","message":"must not be null"},{"field":"description","message":"must not be blank"},{"field":"employee","message":"must not be blank"},{"field":"expenseDate","message":"must not be null"},{"field":"receiptTotal","message":"must not be null"}]}
+
+
+### POST /api/expenses
+{"employee":"  ","expenseDate":"2999-01-01","receiptTotal":12.345,"claimAmount":-5}
+--- response
+HTTP/1.1 400 
+Content-Type: application/problem+json
+
+{"detail":"5 fields need correcting.","instance":"/api/expenses","status":400,"title":"Invalid expense submission","errors":[{"field":"claimAmount","message":"must be greater than 0"},{"field":"description","message":"must not be blank"},{"field":"employee","message":"must not be blank"},{"field":"expenseDate","message":"must be a date in the past or in the present"},{"field":"receiptTotal","message":"numeric value out of bounds (<7 digits>.<2 digits> expected)"}]}
+
+
+### POST /api/expenses
+{"employee":"Brian Kamau","description":"Taxi","expenseDate":"2026-11-17","receiptTotal":50.00,"claimAmount":80.00}
+--- response
+HTTP/1.1 400 
+Content-Type: application/problem+json
+
+{"detail":"1 field needs correcting.","instance":"/api/expenses","status":400,"title":"Invalid expense submission","errors":[{"field":"claimAmount","message":"must not be more than the receipt total"}]}
+
+
+### POST /api/expenses
+{"employee":"Brian Kamau","description":"Taxi","expenseDate":"2026-11-17","receiptTotal":"fifty","claimAmount":50.00}
+--- response
+HTTP/1.1 400 
+Content-Type: application/problem+json
+
+{"detail":"1 field needs correcting.","instance":"/api/expenses","status":400,"title":"Invalid expense submission","errors":[{"field":"receiptTotal","message":"is not a valid amount in US dollars"}]}
+
+
+### POST /api/expenses
+{"employee":"Carol Wanjiru","description":"Hotel night","expenseDate":"2026-11-16","receiptTotal":150.00,"claimAmount":150.00}
+--- response
+HTTP/1.1 201 
+Location: /api/expenses/2
+Content-Type: application/json
+
+{"id":2,"employee":"Carol Wanjiru","description":"Hotel night","expenseDate":"2026-11-16","receiptTotal":150.00,"claimAmount":150.00,"currency":"USD","submittedAt":"2026-11-19T21:52:03.910314Z"}
+
+
+### GET /actuator/health
+--- response
+HTTP/1.1 200 
+Content-Type: application/vnd.spring-boot.actuator.v3+json
+
+{"groups":["liveness","readiness"],"status":"UP"}
+
+
+### GET /actuator
+--- response
+HTTP/1.1 200 
+Content-Type: application/vnd.spring-boot.actuator.v3+json
+Content-Length: 443
+
+{"_links":{"self":{"href":"http://localhost:18080/actuator","templated":false},"health":{"href":"http://localhost:18080/actuator/health","templated":false},"health-path":{"href":"http://localhost:18080/actuator/health/{*path}","templated":true},"metrics":{"href":"http://localhost:18080/actuator/metrics","templated":false},"metrics-requiredMetricName":{"href":"http://localhost:18080/actuator/metrics/{requiredMetricName}","templated":true}}}
+
+
+### GET /actuator/metrics/http.server.requests?tag=uri:/api/expenses
+--- response
+HTTP/1.1 200 
+Content-Disposition: inline;filename=f.txt
+Content-Type: application/vnd.spring-boot.actuator.v3+json
+Content-Length: 421
+
+{"availableTags":[{"tag":"exception","values":["none"]},{"tag":"method","values":["POST","GET"]},{"tag":"error","values":["none"]},{"tag":"outcome","values":["CLIENT_ERROR","SUCCESS"]},{"tag":"status","values":["400","200","201"]}],"baseUnit":"seconds","measurements":[{"statistic":"COUNT","value":7.0},{"statistic":"TOTAL_TIME","value":0.069889624},{"statistic":"MAX","value":0.041985125}],"name":"http.server.requests"}
+
+
+### GET /actuator/env
+--- response
+HTTP/1.1 404 
+Content-Type: application/problem+json
+
+{"detail":"No static resource actuator/env.","instance":"/actuator/env","status":404,"title":"Not Found"}
+
+
+### GET /actuator/configprops
+--- response
+HTTP/1.1 404 
+Content-Type: application/problem+json
+
+{"detail":"No static resource actuator/configprops.","instance":"/actuator/configprops","status":404,"title":"Not Found"}
+
+
+### GET /actuator/beans
+--- response
+HTTP/1.1 404 
+Content-Type: application/problem+json
+
+{"detail":"No static resource actuator/beans.","instance":"/actuator/beans","status":404,"title":"Not Found"}
+
+
