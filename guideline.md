@@ -28,51 +28,48 @@ and SQL-02 keep the older table format.
 Use this structure:
 
 ```markdown
-# <CODE> feedback: <Title>
+# <CODE>
 
-**From:** <reviewer> · **Date:** <D Mon YYYY>
-**Deliverable:** <CODE> / <n> – <Title> (`status: <status>` in the instructions)
-**Branch:** `deliverable/<code>` (PR #<n>)
+**Date:** <D Mon YYYY>\
+**Deliverable:** <CODE>: <Title>
 
-I worked through this deliverable as a SWE1 trainee would: <starter only / no starter>, following
-the instructions as written, and kept notes wherever I hesitated or had to guess.
+I worked through this deliverable as a SWE1 trainee would, following the instructions as written,
+and kept notes wherever I hesitated or had to guess.
 
-## At a glance
+## Overview
 
-| | <CODE> |
-|---|---|
-| Can a SWE1 finish it from the instructions alone? | Yes / Yes, with effort / ... |
-| Difficulty | Low / Medium / Medium-high / High |
-| Realistic SWE1 time (budget is <n> min) | <a–b h> |
-| Starter quality | Excellent / Good / ... / No starter supplied |
-
-## Experience
-
-A short paragraph or a few bullets: how setup went, what worked well, and the moments that teach
+One short paragraph: what the trainee builds or fixes, the starter (or that there is none),
+whether a SWE1 can finish it from the instructions alone, and the realistic time against the
+budget. End with "What works well:" and a few bullets: how setup went and the moments that teach
 well. Quote what you actually saw (test counts, output lines, error messages).
 
-## Where I hesitated / where a trainee will get stuck
+## Concerns
 
 1. **Short label (high impact, if it is).** What a trainee would do or get wrong, with the
    numbers or output that show it, and the one sentence that would prevent it.
 2. ...
 
-**Suggested changes:** a one-line list of the fixes above.
+## Summary
 
-## Summary for the tracker
-
-| Code | Any changes needed? | Can be done in 2 hrs? | Verdict |
-|---|---|---|---|
-| <CODE> | Yes: <short list> / No | Yes / Borderline, <a–b h> / No, <a–b h> | One or two short sentences. |
+- **Changes needed:** Yes. <one-line list of the fixes above> / No.
+- **Can be done in 2 hrs?** Yes / Borderline, <a–b h> / No, <a–b h>.
+- **Verdict:** One or two short sentences.
 ```
 
+- Keep the header minimal: the title is just the code, then only the Date and Deliverable lines
+  (`<CODE>: <Title>`). No From, Branch, PR number or `status:`, and no starter details in the
+  intro sentence (the starter belongs in the Overview paragraph).
+- Use exactly these sections, in this order: Overview, Concerns, Summary. No "At a glance"
+  table and no separate "Suggested changes" line (that list is the "Changes needed" bullet).
 - Do not include a walkthrough, an exit-criteria table, an evidence dump, or a prerequisites
   section. Detailed evidence belongs in the solution (for example its `SUBMISSION.md`).
+- If the realistic time is over the budget, that is the first concern ("Time (high impact)").
 - Order the points by impact: the time limit, setup blockers, and anything that makes an exit
   criterion ungradeable or makes a trainee who solves the stated problem still fail a criterion.
 - Each point should say what a trainee would actually do or get wrong, and how you know (what
   happened when you did it).
-- Say what is good too. "Experience" is where strong starters and well-designed moments are
+- Say what is good too. "Overview" is where strong starters and well-designed moments are
   credited.
+- The summary is a short list, not a table: each file covers one deliverable.
 - Mention things that affect more than one deliverable (for example version drift between
   starters) where you notice them.
