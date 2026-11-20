@@ -1,0 +1,15 @@
+# Python virtual environment for the optional dashboard
+.venv/
+__pycache__/
+*.pyc
+
+# Local connection settings
+.env
+.pgpass
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

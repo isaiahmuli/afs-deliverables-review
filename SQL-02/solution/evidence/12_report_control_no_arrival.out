@@ -1,0 +1,8 @@
+== Control: supplied report.sql at READ COMMITTED with NO second session (why rerunning 'does not always show the mismatch')
+ order_id | order_revenue | orders_in_rows | revenue_in_rows | orders_in_header | revenue_in_header 
+----------+---------------+----------------+-----------------+------------------+-------------------
+      483 |       3585.34 |           2000 |      3707644.61 |             2000 |        3707644.61
+   992081 |        299.93 |           2000 |      3707644.61 |             2000 |        3707644.61
+(2000 rows)
+
+COMMIT

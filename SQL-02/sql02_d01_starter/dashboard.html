@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boutique · Sale dashboard</title>
+  <style>
+    :root{color-scheme:light;--ink:#202e2a;--muted:#6b766f;--paper:#f5f4ee;--line:#e2e5dc;--green:#315e49;--soft:#eaf0e8;--amber:#916627}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:wait;opacity:.6}button:focus-visible,input:focus-visible{outline:3px solid #a1bda4;outline-offset:3px}
+    .topbar{background:#fff;border-bottom:1px solid var(--line)}.topbar-inner{max-width:1240px;margin:auto;padding:19px 30px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+    .brand{font-family:Georgia,serif;font-size:26px;letter-spacing:-1px}.brand span{font:11px system-ui;letter-spacing:2px;color:var(--muted);margin-left:18px}.live{font-size:12px;color:var(--green)}.live:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#719a6e;margin-right:8px}
+    main{max-width:1240px;margin:auto;padding:36px 30px 50px}.heading{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:26px}.eyebrow{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--green);font-weight:700}h1{font:42px/1.15 Georgia,serif;letter-spacing:-1.2px;margin:8px 0 10px}.subtitle{margin:0;color:var(--muted);max-width:620px}
+    .primary{border:0;border-radius:7px;padding:12px 19px;background:var(--green);color:white;white-space:nowrap}.loadbar{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:13px 17px;border:1px solid var(--line);border-radius:8px;margin-bottom:22px;background:#eeeee5;font-size:13px}.loadbar strong{font-variant-numeric:tabular-nums}.loadbar span{color:var(--muted)}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}.stat,.panel{background:#fff;border:1px solid var(--line);border-radius:10px}.stat{padding:20px 22px}.stat-label{color:var(--muted);font-size:12px}.stat-value{display:block;font-size:31px;line-height:1.3;font-weight:600;letter-spacing:-1px;margin:8px 0 2px;font-variant-numeric:tabular-nums}.stat-note{font-size:11px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.panel{min-width:0}.panel.wide{grid-column:1/-1}.panel-head{padding:21px 22px 16px;display:flex;justify-content:space-between;align-items:start;gap:14px}h2{font-size:16px;margin:0 0 5px;font-weight:650}.panel-desc{font-size:12px;color:var(--muted);margin:0}.badge{font-size:11px;border-radius:20px;background:var(--soft);color:var(--green);padding:4px 10px;white-space:nowrap}.badge.loading{color:var(--amber);background:#f6eddb}.badge.failed{background:#fbe9e4;color:#963d2d}
+    .filter{padding:0 22px 16px;display:flex;gap:9px;align-items:center;font-size:12px;color:var(--muted)}input{width:105px;border:1px solid #d5dbd1;border-radius:5px;padding:6px 9px;color:var(--ink);background:#fff}.secondary{background:#fff;border:1px solid #d5dbd1;border-radius:5px;padding:6px 11px;font-size:12px;color:var(--ink)}
+    .table-wrap{overflow:auto;min-height:190px;max-height:350px}table{width:100%;border-collapse:collapse;text-align:left;font-size:12px;font-variant-numeric:tabular-nums}th{position:sticky;top:0;background:#fafbf7;padding:11px 22px;color:var(--muted);font-weight:500;white-space:nowrap;border-block:1px solid var(--line)}td{padding:10px 22px;border-bottom:1px solid #f0f1eb;white-space:nowrap}tbody tr:last-child td{border-bottom:0}.status{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;background:#edf2ed;color:#4d7257}.status.pending{background:#fbf0da;color:#946d28}
+    .empty{padding:50px 22px;text-align:center;color:var(--muted);font-size:13px}.spinner{display:inline-block;width:14px;height:14px;border:2px solid #dce4d8;border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:8px}@keyframes spin{to{transform:rotate(360deg)}}
+    .panel-foot{border-top:1px solid var(--line);padding:11px 22px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;font-size:11px;color:var(--muted)}.panel-foot strong{font-weight:500;color:var(--ink)}.page-foot{margin-top:23px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}.error{color:#963d2d}
+    @media(max-width:760px){main{padding:24px 16px}.topbar-inner{padding:16px}.brand span{display:none}.heading{align-items:start;flex-direction:column}h1{font-size:35px}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.stat{padding:16px}.grid{grid-template-columns:1fr}.panel-head,td,th{padding-left:16px;padding-right:16px}.loadbar{font-size:12px}}
+    @media(prefers-reduced-motion:reduce){.spinner{animation:none}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="topbar-inner"><div class="brand">boutique<span>OPERATIONS</span></div><div class="live">Practice database</div></div></header>
+  <main>
+    <div class="heading"><div><div class="eyebrow">Sale preparation</div><h1>Everything ready for the rush?</h1><p class="subtitle">A live view of orders waiting to go out, recent customer activity, and the wholesale order book.</p></div><button class="primary" id="reload">Reload dashboard</button></div>
+    <div class="loadbar" role="status" aria-live="polite"><div id="load-status">Ready to load</div><span id="load-detail">Live queries · no cached results</span></div>
+    <div class="stats" id="stats" aria-busy="true">
+      <div class="stat"><span class="stat-label">Total orders</span><strong class="stat-value" data-stat="orders">—</strong><span class="stat-note">All recorded orders</span></div>
+      <div class="stat"><span class="stat-label">Awaiting packing</span><strong class="stat-value" data-stat="pending">—</strong><span class="stat-note">Pending orders</span></div>
+      <div class="stat"><span class="stat-label">Customers</span><strong class="stat-value" data-stat="customers">—</strong><span class="stat-note">Registered accounts</span></div>
+      <div class="stat"><span class="stat-label">Products</span><strong class="stat-value" data-stat="products">—</strong><span class="stat-note">Across the catalog</span></div>
+    </div>
+    <div class="grid">
+      <section class="panel" id="history" aria-labelledby="history-title"><div class="panel-head"><div><h2 id="history-title">Customer order history</h2><p class="panel-desc">The latest orders for one customer.</p></div><span class="badge">Waiting</span></div><form class="filter" id="customer-form"><label for="customer">Customer ID</label><input id="customer" type="number" min="1" max="100000" value="1" required><button class="secondary" id="history-submit">Load</button></form><div class="table-wrap"></div><div class="panel-foot"></div></section>
+      <section class="panel" id="packing" aria-labelledby="packing-title"><div class="panel-head"><div><h2 id="packing-title">Packing queue</h2><p class="panel-desc">Oldest pending orders, ready to process.</p></div><span class="badge">Waiting</span></div><div class="table-wrap"></div><div class="panel-foot"></div></section>
+      <section class="panel wide" id="wholesale" aria-labelledby="wholesale-title"><div class="panel-head"><div><h2 id="wholesale-title">Wholesale order book</h2><p class="panel-desc">Customer 1 · All order items for the largest account.</p></div><span class="badge">Waiting</span></div><div class="table-wrap"></div><div class="panel-foot"></div></section>
+    </div>
+    <footer class="page-foot"><span id="overview-timing">Shop totals loading…</span><span>Read-only dashboard · Timings include fetching data and database round trips.</span></footer>
+  </main>
+  <script>
+    const $ = id => document.getElementById(id);
+    const number = value => Number(value).toLocaleString();
+    const duration = ms => ms >= 1000 ? `${(ms/1000).toFixed(2)} s` : `${ms.toFixed(1)} ms`;
+    const node = (tag, text, className) => { const el=document.createElement(tag); el.textContent=text; if(className) el.className=className; return el; };
+    const columns = {
+      history:[['order_id','Order'],['status','Status'],['created_at','Placed']],
+      packing:[['order_id','Order'],['customer_id','Customer'],['created_at','Placed']],
+      wholesale:[['order_id','Order'],['item_no','Line'],['product_id','Product'],['quantity','Quantity'],['unit_price','Unit price']]
+    };
+    async function request(panel) {
+      const section=$(panel), start=performance.now();
+      if(section){section.setAttribute('aria-busy','true'); const badge=section.querySelector('.badge'); badge.textContent='Loading'; badge.className='badge loading'; section.querySelector('.table-wrap').replaceChildren(node('div','Loading live data…','empty'));section.querySelector('.panel-foot').textContent='';}
+      try {
+        const query=panel==='history' ? `?customer=${encodeURIComponent($('customer').value)}` : '';
+        const response=await fetch(`/api/${panel}${query}`,{cache:'no-store'});
+        const data=await response.json(); if(!response.ok) throw new Error(data.error || 'Request failed');
+        const elapsed=performance.now()-start;
+        if(panel==='overview'){
+          document.querySelectorAll('[data-stat]').forEach(el=>el.textContent=number(data.stats[el.dataset.stat]));
+          $('overview-timing').textContent=`Shop totals loaded in ${duration(elapsed)}`;
+        }else{
+          const table=node('table',''), head=node('tr',''), thead=node('thead',''), tbody=node('tbody','');
+          columns[panel].forEach(([,label])=>{const th=node('th',label);th.scope='col';head.append(th);});thead.append(head);table.append(thead,tbody);
+          data.rows.slice(0,20).forEach(row=>{const tr=node('tr',''); columns[panel].forEach(([key])=>{const td=node('td','');if(key==='status')td.append(node('span',row[key],'status '+(row[key]==='PENDING'?'pending':'')));else td.textContent=key==='created_at'?row[key].slice(0,16):row[key];tr.append(td);});tbody.append(tr);});
+          section.querySelector('.table-wrap').replaceChildren(data.rows.length?table:node('div','No orders found.','empty'));
+          const badge=section.querySelector('.badge');badge.textContent=duration(elapsed);badge.className='badge';
+          const foot=section.querySelector('.panel-foot');
+          foot.append(node('span',`Showing ${Math.min(20,data.rows.length)} of ${number(data.rows.length)} rows${data.order_count!==undefined?' · '+number(data.order_count)+' orders':''}`));
+          foot.append(node('strong',`${number(data.query_count)} SQL statement${data.query_count===1?'':'s'} · ${duration(data.query_ms)} fetching data`));
+        }
+        return true;
+      }catch(error){
+        if(section){const badge=section.querySelector('.badge');badge.textContent='Failed';badge.className='badge failed';section.querySelector('.table-wrap').replaceChildren(node('div',error.message,'empty error'));}
+        else{$('overview-timing').textContent=error.message;document.querySelectorAll('[data-stat]').forEach(el=>el.textContent='—');}
+        return false;
+      }finally{if(section)section.setAttribute('aria-busy','false');if(panel==='overview')$('stats').setAttribute('aria-busy','false');}
+    }
+    async function reload(){
+      $('reload').disabled=true;$('history-submit').disabled=true;$('customer').disabled=true;
+      document.querySelectorAll('[data-stat]').forEach(el=>el.textContent='—');$('stats').setAttribute('aria-busy','true');
+      const start=performance.now();let complete=0;
+      const update=()=>{$('load-status').textContent=`Loading dashboard · ${duration(performance.now()-start)}`;$('load-detail').textContent=`${complete} of 4 sections ready`;};
+      update();const timer=setInterval(update,100);
+      const results=await Promise.all(['overview','history','packing','wholesale'].map(async panel=>{const ok=await request(panel);if(ok)complete++;return ok;}));
+      clearInterval(timer);const elapsed=duration(performance.now()-start);
+      $('load-status').textContent=results.every(Boolean)?`Dashboard ready in ${elapsed}`:`Dashboard finished with errors after ${elapsed}`;
+      $('load-detail').textContent=`${complete} of 4 sections ready · ${new Date().toLocaleTimeString()}`;
+      $('reload').disabled=false;$('history-submit').disabled=false;$('customer').disabled=false;
+    }
+    $('reload').addEventListener('click',reload);
+    $('customer-form').addEventListener('submit',async event=>{event.preventDefault();$('history-submit').disabled=true;await request('history');$('history-submit').disabled=false;});
+    reload();
+  </script>
+</body>
+</html>

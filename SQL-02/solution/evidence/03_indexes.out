@@ -1,0 +1,30 @@
+-- Fixes for the two slow queries. Indexes only: no table, data, or query changes.
+-- Order history: WHERE customer_id = ? ORDER BY created_at DESC, order_id DESC LIMIT 20.
+-- Composite index: the equality column first, then the sort columns in the query's order.
+-- PostgreSQL reads it backwards for DESC, so it returns the newest 20 rows already sorted
+-- and stops: no Seq Scan over 995,110 orders and no Sort step.
+CREATE INDEX orders_customer_created_idx
+    ON orders (customer_id, created_at, order_id);
+CREATE INDEX
+-- Packing queue: WHERE status = 'PENDING' ORDER BY created_at, order_id LIMIT 100.
+-- Partial index: holds only PENDING orders (about 19k of 995k rows), already in
+-- queue order, so the query reads the first 100 entries and stops.
+CREATE INDEX orders_pending_created_idx
+    ON orders (created_at, order_id)
+    WHERE status = 'PENDING';
+CREATE INDEX
+ANALYZE orders;
+ANALYZE
+SELECT indexrelid::regclass AS index_name,
+       pg_size_pretty(pg_relation_size(indexrelid)) AS size,
+       pg_get_indexdef(indexrelid) AS definition
+FROM pg_index
+WHERE indrelid = 'orders'::regclass
+ORDER BY 1;
+         index_name          |  size  |                                                          definition                                                          
+-----------------------------+--------+------------------------------------------------------------------------------------------------------------------------------
+ orders_pkey                 | 21 MB  | CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (order_id)
+ orders_customer_created_idx | 39 MB  | CREATE INDEX orders_customer_created_idx ON public.orders USING btree (customer_id, created_at, order_id)
+ orders_pending_created_idx  | 608 kB | CREATE INDEX orders_pending_created_idx ON public.orders USING btree (created_at, order_id) WHERE (status = 'PENDING'::text)
+(3 rows)
+

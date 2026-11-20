@@ -1,0 +1,12 @@
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+COMMIT
+        name        | installed_version 
+--------------------+-------------------
+ pg_stat_statements | 1.12
+(1 row)
+
