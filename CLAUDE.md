@@ -9,7 +9,7 @@ trainees get it. It is not to produce a polished product.
 
 Before starting work on any branch, and before making any change, read
 [`guideline.md`](guideline.md) and apply it. It holds the rules for each deliverable's
-`report.md`. When it and this file disagree, follow `guideline.md`.
+private feedback file. When it and this file disagree, follow `guideline.md`.
 
 ## Layout
 
@@ -20,7 +20,7 @@ One folder per deliverable, named by its curriculum code (for example `AI-01/`, 
   deliverable-instructions.md   # what the trainee sees (source of truth; may be .yml in older ones)
   starter/                      # only if the deliverable says starter files are supplied
   solution/                     # our attempt, done as a trainee would
-  report.md                     # see guideline.md
+  <CODE>-deliverable-feedback.md  # private feedback, see guideline.md (older folders: report.md)
 ```
 
 Folders may be reorganised later when deliverables turn out to build on each other. Ask before
