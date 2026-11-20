@@ -1,0 +1,55 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.9.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :clean
+> Task :compileJava
+> Task :processResources
+> Task :classes
+> Task :resolveMainClassName
+> Task :bootJar
+> Task :jar
+> Task :assemble
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+> Task :test
+ExpenseApiApplicationTests > contextLoads() PASSED
+ExpenseApiIntegrationTest > unknownIdIsNotFound() PASSED
+ExpenseApiIntegrationTest > onlyHealthAndMetricsAreExposed() PASSED
+ExpenseApiIntegrationTest > requestMetricsReflectApiTraffic() PASSED
+ExpenseApiIntegrationTest > refusedSubmissionsAreNotSaved() PASSED
+ExpenseApiIntegrationTest > healthIsUp() PASSED
+ExpenseApiIntegrationTest > claimOf150IsAcceptedUnderTheBaseLimitOf500() PASSED
+ExpenseApiIntegrationTest > submitThenRetrieveThroughEveryLayer() PASSED
+TeamBProfileIntegrationTest > profileOverridesTheBaseLimit() PASSED
+TeamBProfileIntegrationTest > claimOf150IsRefusedUnderTheTeamBLimitAndNotSaved() PASSED
+ExpenseServiceTest > claimOverTheLimitIsRefusedAndNotSaved() PASSED
+ExpenseServiceTest > unknownIdIsNotFound() PASSED
+ExpenseServiceTest > claimAtTheLimitIsSaved() PASSED
+ClaimWithinReceiptValidatorTest > missingAmountsAreLeftToNotNull() PASSED
+ClaimWithinReceiptValidatorTest > partOrAllOfTheReceiptIsAllowed(String, String) > claim "50.00" of receipt "120.00" is allowed PASSED
+ClaimWithinReceiptValidatorTest > partOrAllOfTheReceiptIsAllowed(String, String) > claim "120.00" of receipt "120.00" is allowed PASSED
+ClaimWithinReceiptValidatorTest > partOrAllOfTheReceiptIsAllowed(String, String) > claim "119.99" of receipt "120" is allowed PASSED
+ClaimWithinReceiptValidatorTest > partOrAllOfTheReceiptIsAllowed(String, String) > claim "0.01" of receipt "0.01" is allowed PASSED
+ClaimWithinReceiptValidatorTest > moreThanTheReceiptIsRefusedOnClaimAmount(String, String) > claim "80.00" of receipt "50.00" is refused PASSED
+ClaimWithinReceiptValidatorTest > moreThanTheReceiptIsRefusedOnClaimAmount(String, String) > claim "120.01" of receipt "120.00" is refused PASSED
+ExpenseControllerTest > bodyThatIsNotJsonIsRefused() PASSED
+ExpenseControllerTest > nonNumericIdReturns400() PASSED
+ExpenseControllerTest > listReturnsEveryExpense() PASSED
+ExpenseControllerTest > unknownIdReturns404() PASSED
+ExpenseControllerTest > claimEqualToReceiptTotalIsValid() PASSED
+ExpenseControllerTest > getReturnsOneExpense() PASSED
+ExpenseControllerTest > customConstraintIsReportedAlongsideBuiltInFailures() PASSED
+ExpenseControllerTest > wrongTypeNamesTheField() PASSED
+ExpenseControllerTest > validSubmissionReturns201WithTheSavedExpense() PASSED
+ExpenseControllerTest > badAmountsAreRefusedOnThatField(String, String) > claimAmount "0" -> "must be greater than 0" PASSED
+ExpenseControllerTest > badAmountsAreRefusedOnThatField(String, String) > claimAmount "-5.00" -> "must be greater than 0" PASSED
+ExpenseControllerTest > badAmountsAreRefusedOnThatField(String, String) > claimAmount "10.555" -> "numeric value out of bounds (<7 digits>.<2 digits> expected)" PASSED
+ExpenseControllerTest > overTheTeamLimitReturns422WithTheReason() PASSED
+ExpenseControllerTest > impossibleDateNamesTheField() PASSED
+ExpenseControllerTest > customConstraintRefusesAClaimAboveTheReceiptTotal() PASSED
+ExpenseControllerTest > emptySubmissionNamesEveryFieldInOneResponseAndSavesNothing() PASSED
+> Task :check
+> Task :build
+BUILD SUCCESSFUL in 10s
+8 actionable tasks: 8 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.1/userguide/configuration_cache_enabling.html

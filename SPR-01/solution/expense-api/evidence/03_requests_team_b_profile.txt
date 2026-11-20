@@ -1,0 +1,36 @@
+### POST /api/expenses
+{"employee":"Carol Wanjiru","description":"Hotel night","expenseDate":"2026-11-16","receiptTotal":150.00,"claimAmount":150.00}
+--- response
+HTTP/1.1 422 
+Content-Type: application/problem+json
+
+{"detail":"The claim of 150.00 USD exceeds this team's limit of 100.00 USD per claim.","instance":"/api/expenses","status":422,"title":"Claim exceeds team limit","claimAmount":150.00,"maxClaimAmount":100.00}
+
+
+### GET /api/expenses
+--- response
+HTTP/1.1 200 
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+### POST /api/expenses
+{"employee":"Amina Otieno","description":"Fuel for client visit (business share of $120 receipt)","expenseDate":"2026-11-18","receiptTotal":120.00,"claimAmount":50.00}
+--- response
+HTTP/1.1 201 
+Location: /api/expenses/1
+Content-Type: application/json
+
+{"id":1,"employee":"Amina Otieno","description":"Fuel for client visit (business share of $120 receipt)","expenseDate":"2026-11-18","receiptTotal":120.00,"claimAmount":50.00,"currency":"USD","submittedAt":"2026-11-19T21:52:04.094001Z"}
+
+
+### GET /actuator/health
+--- response
+HTTP/1.1 200 
+Content-Type: application/vnd.spring-boot.actuator.v3+json
+
+{"groups":["liveness","readiness"],"status":"UP"}
+
+
