@@ -1,0 +1,94 @@
+$ ./gradlew test --tests boutique.ConcurrentSaleTest   # ORIGINAL starter code, @Disabled removed
+> Task :compileJava
+> Task :processResources NO-SOURCE
+> Task :classes
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+> Task :test FAILED
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 1 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 2 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 3 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 4 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 5 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 6 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 7 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 8 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 9 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 10 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 11 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 12 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 13 of 25 FAILED
+    org.mockito.exceptions.verification.TooManyActualInvocations at ConcurrentSaleTest.java:49
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 14 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 15 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 16 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 17 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 18 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 19 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 20 of 25 FAILED
+    org.mockito.exceptions.verification.TooManyActualInvocations at ConcurrentSaleTest.java:49
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 21 of 25 FAILED
+    org.mockito.exceptions.verification.TooManyActualInvocations at ConcurrentSaleTest.java:49
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 22 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 23 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 24 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+ConcurrentSaleTest > onlySixtyShoppersReserveAndOnlyThoseOrdersReachTheManifest() > repetition 25 of 25 FAILED
+    java.lang.AssertionError at ConcurrentSaleTest.java:46
+25 tests completed, 25 failed
+FAILURE: Build failed with an exception.
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///Users/isaiahmuli/visual%20studio%20projects/afs-30-nov-cohort/deliverables%20review/JAVA-02/solution/sale-checkout/build/reports/tests/test/index.html
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+BUILD FAILED in 1s
+3 actionable tasks: 3 executed
+
+# Failure messages from build/test-results (JUnit XML), one per repetition:
+repetition 1 of 25: java.lang.AssertionError: Expected size: 60 but was: 67 in: ["order-36", "order-45", "order-12", "order-15", "order-25", "order-28", "order-49", "order-65", "or
+repetition 2 of 25: java.lang.AssertionError: Expected size: 60 but was: 63 in: ["order-1", "order-6", "order-5", "order-10", "order-9", "order-3", "order-16", "order-4", "order-2"
+repetition 3 of 25: java.lang.AssertionError: Expected size: 60 but was: 63 in: ["order-3", "order-8", "order-4", "order-1", "order-11", "order-5", "order-2", "order-15", "order-17
+repetition 4 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-3", "order-12", "order-14", "order-13", "order-2", "order-18", "order-22", "order-23", "orde
+repetition 5 of 25: java.lang.AssertionError: Expected size: 60 but was: 62 in: ["order-2", "order-11", "order-12", "order-1", "order-20", "order-4", "order-5", "order-3", "order-2
+repetition 6 of 25: java.lang.AssertionError: Expected size: 60 but was: 62 in: ["order-1", "order-2", "order-7", "order-16", "order-5", "order-22", "order-9", "order-11", "order-2
+repetition 7 of 25: java.lang.AssertionError: Expected size: 60 but was: 62 in: ["order-2", "order-6", "order-7", "order-3", "order-9", "order-1", "order-10", "order-12", "order-13
+repetition 8 of 25: java.lang.AssertionError: Expected size: 60 but was: 62 in: ["order-2", "order-4", "order-1", "order-7", "order-8", "order-5", "order-11", "order-3", "order-6",
+repetition 9 of 25: java.lang.AssertionError: Expected size: 60 but was: 63 in: ["order-1", "order-2", "order-6", "order-5", "order-19", "order-8", "order-9", "order-21", "order-25
+repetition 10 of 25: java.lang.AssertionError: Expected size: 60 but was: 62 in: ["order-7", "order-9", "order-10", "order-4", "order-5", "order-14", "order-6", "order-16", "order-2
+repetition 11 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-6", "order-7", "order-5", "order-3", "order-1", "order-12", "order-2", "order-13", "order-15
+repetition 12 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-1", "order-2", "order-3", "order-6", "order-4", "order-5", "order-7", "order-8", "order-12",
+repetition 13 of 25: org.mockito.exceptions.verification.TooManyActualInvocations: manifestWriter.append( <Capturing argument: Order> ); Wanted 60 times: -> at boutique.ConcurrentSa
+repetition 14 of 25: java.lang.AssertionError: Expected size: 60 but was: 62 in: ["order-2", "order-15", "order-3", "order-12", "order-18", "order-5", "order-19", "order-21", "order
+repetition 15 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-2", "order-1", "order-12", "order-3", "order-21", "order-5", "order-6", "order-28", "order-2
+repetition 16 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-2", "order-8", "order-9", "order-12", "order-16", "order-18", "order-23", "order-22", "order
+repetition 17 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-1", "order-4", "order-7", "order-8", "order-10", "order-2", "order-3", "order-15", "order-18
+repetition 18 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-7", "order-11", "order-8", "order-2", "order-5", "order-16", "order-21", "order-18", "order-
+repetition 19 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-2", "order-5", "order-1", "order-8", "order-4", "order-3", "order-10", "order-7", "order-6",
+repetition 20 of 25: org.mockito.exceptions.verification.TooManyActualInvocations: manifestWriter.append( <Capturing argument: Order> ); Wanted 60 times: -> at boutique.ConcurrentSa
+repetition 21 of 25: org.mockito.exceptions.verification.TooManyActualInvocations: manifestWriter.append( <Capturing argument: Order> ); Wanted 60 times: -> at boutique.ConcurrentSa
+repetition 22 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-3", "order-11", "order-13", "order-16", "order-5", "order-21", "order-15", "order-19", "orde
+repetition 23 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-1", "order-4", "order-2", "order-13", "order-14", "order-16", "order-18", "order-21", "order
+repetition 24 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-1", "order-5", "order-2", "order-3", "order-11", "order-4", "order-6", "order-9", "order-7",
+repetition 25 of 25: java.lang.AssertionError: Expected size: 60 but was: 61 in: ["order-3", "order-5", "order-8", "order-10", "order-1", "order-2", "order-13", "order-15", "order-4

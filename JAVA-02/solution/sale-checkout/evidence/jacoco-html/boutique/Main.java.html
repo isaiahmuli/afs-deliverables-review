@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sale-checkout</a> &gt; <a href="index.source.html" class="el_package">boutique</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package boutique;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
+
+<span class="nc" id="L9">public class Main {</span>
+    public static void main(String[] args) throws Exception {
+<span class="pc bpc" id="L11" title="1 of 2 branches missed.">        Path output = args.length == 0 ? Path.of(&quot;build&quot;, &quot;sale-output&quot;) : Path.of(args[0]);</span>
+<span class="fc" id="L12">        Files.createDirectories(output);</span>
+<span class="fc" id="L13">        Path run = Files.createTempDirectory(output, &quot;sale-&quot;);</span>
+<span class="fc" id="L14">        Path manifest = run.resolve(&quot;manifest.csv&quot;);</span>
+<span class="fc" id="L15">        Path auditLog = run.resolve(&quot;audit.csv&quot;);</span>
+<span class="fc" id="L16">        var jacket = new Product(&quot;JACKET&quot;, 4999, 60);</span>
+<span class="fc" id="L17">        var accepted = new AtomicInteger();</span>
+<span class="fc" id="L18">        var errors = new AtomicInteger();</span>
+<span class="fc" id="L19">        var ready = new CountDownLatch(200);</span>
+<span class="fc" id="L20">        var start = new CountDownLatch(1);</span>
+<span class="fc" id="L21">        Thread[] shoppers = new Thread[200];</span>
+<span class="fc" id="L22">        try (var checkout = new Checkout(List.of(jacket), new FileManifestWriter(manifest),</span>
+                new AsyncFileWriter&lt;AuditEvent&gt;(auditLog, CsvRecord::toCsvLine), Checkout.DEFAULT_LOW_STOCK_THRESHOLD)) {
+<span class="fc bfc" id="L24" title="All 2 branches covered.">            for (int i = 0; i &lt; shoppers.length; i++) {</span>
+<span class="fc" id="L25">                String id = &quot;order-&quot; + (i + 1);</span>
+<span class="fc" id="L26">                shoppers[i] = new Thread(() -&gt; {</span>
+<span class="fc" id="L27">                    ready.countDown();</span>
+                    try {
+<span class="fc" id="L29">                        start.await();</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">                        if (checkout.checkout(id, &quot;JACKET&quot;, 1)) accepted.incrementAndGet();</span>
+<span class="nc" id="L31">                    } catch (Exception e) {</span>
+<span class="nc" id="L32">                        errors.incrementAndGet();</span>
+<span class="nc" id="L33">                        System.err.println(id + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L34">                    }</span>
+<span class="fc" id="L35">                });</span>
+<span class="fc" id="L36">                shoppers[i].start();</span>
+            }
+<span class="fc" id="L38">            ready.await();</span>
+<span class="fc" id="L39">            start.countDown();</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">            for (Thread shopper : shoppers) shopper.join();</span>
+<span class="fc" id="L41">            checkout.changePrice(&quot;JACKET&quot;, 5499); // after the sale; recorded in the audit log</span>
+        }
+<span class="fc" id="L43">        System.out.println(&quot;Jackets available: 60&quot;);</span>
+<span class="fc" id="L44">        System.out.println(&quot;Shoppers: 200&quot;);</span>
+<span class="fc" id="L45">        System.out.println(&quot;Reservations accepted: &quot; + accepted.get());</span>
+<span class="fc" id="L46">        System.out.println(&quot;Jackets left: &quot; + jacket.stock());</span>
+<span class="fc" id="L47">        System.out.println(&quot;Checkout errors: &quot; + errors.get());</span>
+<span class="fc" id="L48">        System.out.println(&quot;Manifest lines after close: &quot; + Files.readAllLines(manifest).size());</span>
+<span class="fc" id="L49">        System.out.println(&quot;Audit lines after close: &quot; + Files.readAllLines(auditLog).size());</span>
+<span class="fc" id="L50">        System.out.println(&quot;Manifest: &quot; + manifest.toAbsolutePath());</span>
+<span class="fc" id="L51">        System.out.println(&quot;Audit log: &quot; + auditLog.toAbsolutePath());</span>
+<span class="fc" id="L52">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.16.202610240946</span></div></body></html>

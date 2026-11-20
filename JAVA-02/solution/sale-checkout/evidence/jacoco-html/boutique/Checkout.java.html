@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Checkout.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sale-checkout</a> &gt; <a href="index.source.html" class="el_package">boutique</a> &gt; <span class="el_source">Checkout.java</span></div><h1>Checkout.java</h1><pre class="source lang-java linenums">package boutique;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
+
+public class Checkout implements AutoCloseable {
+    public static final int DEFAULT_LOW_STOCK_THRESHOLD = 5;
+
+    private final List&lt;Product&gt; products;
+    private final RecordWriter&lt;Order&gt; manifest;
+    private final RecordWriter&lt;AuditEvent&gt; audit;
+    private final int lowStockThreshold;
+
+    /** Original constructor: no audit log, low-stock threshold 5. */
+    public Checkout(List&lt;Product&gt; products, RecordWriter&lt;Order&gt; manifest) {
+<span class="fc" id="L21">        this(products, manifest, event -&gt; { }, DEFAULT_LOW_STOCK_THRESHOLD);</span>
+<span class="fc" id="L22">    }</span>
+
+    public Checkout(List&lt;Product&gt; products, RecordWriter&lt;Order&gt; manifest, RecordWriter&lt;AuditEvent&gt; audit,
+<span class="fc" id="L25">                    int lowStockThreshold) {</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (lowStockThreshold &lt; 0) {</span>
+<span class="fc" id="L27">            throw new IllegalArgumentException(&quot;Low-stock threshold must not be negative: &quot; + lowStockThreshold);</span>
+        }
+<span class="fc" id="L29">        this.products = List.copyOf(products);</span>
+<span class="fc" id="L30">        this.manifest = Objects.requireNonNull(manifest, &quot;manifest&quot;);</span>
+<span class="fc" id="L31">        this.audit = Objects.requireNonNull(audit, &quot;audit&quot;);</span>
+<span class="fc" id="L32">        this.lowStockThreshold = lowStockThreshold;</span>
+<span class="fc" id="L33">    }</span>
+
+    /** The product with this code, or empty if the store does not sell it. */
+    public Optional&lt;Product&gt; findProduct(String code) {
+<span class="fc" id="L37">        return products.stream()</span>
+<span class="fc" id="L38">                .filter(product -&gt; product.code().equals(code))</span>
+<span class="fc" id="L39">                .findFirst();</span>
+    }
+
+    /**
+     * Reserves the units and queues the order for the manifest and the audit log.
+     * Returns without waiting for either file.
+     *
+     * @return false, changing nothing and writing nothing, for an unknown code or a zero,
+     *     negative, or unavailable quantity
+     */
+    public boolean checkout(String orderId, String code, int quantity) throws IOException {
+<span class="fc" id="L50">        Optional&lt;Order&gt; reserved = findProduct(code).flatMap(product -&gt; product.reserve(orderId, quantity));</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (reserved.isEmpty()) {</span>
+<span class="fc" id="L52">            return false;</span>
+        }
+<span class="fc" id="L54">        Order order = reserved.orElseThrow();</span>
+<span class="fc" id="L55">        manifest.append(order);</span>
+<span class="fc" id="L56">        audit.append(AuditEvent.Reservation.of(order));</span>
+<span class="fc" id="L57">        return true;</span>
+    }
+
+    /** Changes the price and records it in the audit log. Returns false for an unknown code. */
+    public boolean changePrice(String code, long priceCents) throws IOException {
+<span class="fc" id="L62">        Optional&lt;Product&gt; product = findProduct(code);</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (product.isEmpty()) {</span>
+<span class="fc" id="L64">            return false;</span>
+        }
+<span class="fc" id="L66">        long oldPrice = product.orElseThrow().changePrice(priceCents);</span>
+<span class="fc" id="L67">        audit.append(new AuditEvent.PriceChange(Instant.now(), code, oldPrice, priceCents));</span>
+<span class="fc" id="L68">        return true;</span>
+    }
+
+    /** Products in catalog order that match the filter. */
+    public List&lt;Product&gt; productsMatching(Predicate&lt;? super Product&gt; filter) {
+<span class="fc" id="L73">        return products.stream().filter(filter).toList();</span>
+    }
+
+    /** Products with fewer units than the store's threshold, in catalog order. */
+    public List&lt;Product&gt; lowStock() {
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        return productsMatching(product -&gt; product.stock() &lt; lowStockThreshold);</span>
+    }
+
+    /** The original low-stock loop, kept unchanged so a test can compare it with lowStock(). */
+    List&lt;Product&gt; originalLowStockLoop() {
+<span class="fc" id="L83">        List&lt;Product&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        for (Product product : products) {</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">            if (product.stock() &lt; 5) result.add(product);</span>
+<span class="fc" id="L86">        }</span>
+<span class="fc" id="L87">        return result;</span>
+    }
+
+    /** Waits for every pending manifest and audit line, then closes both files. */
+    @Override
+    public void close() throws IOException {
+        try {
+<span class="fc" id="L94">            manifest.close();</span>
+        } finally {
+<span class="fc" id="L96">            audit.close();</span>
+        }
+<span class="fc" id="L98">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.16.202610240946</span></div></body></html>

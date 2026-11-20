@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Product.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sale-checkout</a> &gt; <a href="index.source.html" class="el_package">boutique</a> &gt; <span class="el_source">Product.java</span></div><h1>Product.java</h1><pre class="source lang-java linenums">package boutique;
+
+import java.util.Optional;
+
+/**
+ * A product whose stock and price can change while shoppers check out. Every read and
+ * change holds this product's lock, so a reservation checks and takes stock in one step.
+ */
+public class Product {
+    private final String code;
+    private long priceCents;
+    private int stock;
+
+<span class="fc" id="L14">    public Product(String code, long priceCents, int stock) {</span>
+<span class="pc bpc" id="L15" title="1 of 4 branches missed.">        if (code == null || code.isBlank()) {</span>
+<span class="fc" id="L16">            throw new IllegalArgumentException(&quot;Product code must not be blank&quot;);</span>
+        }
+<span class="fc bfc" id="L18" title="All 4 branches covered.">        if (priceCents &lt; 0 || stock &lt; 0) {</span>
+<span class="fc" id="L19">            throw new IllegalArgumentException(&quot;Price and stock must not be negative&quot;);</span>
+        }
+<span class="fc" id="L21">        this.code = code;</span>
+<span class="fc" id="L22">        this.priceCents = priceCents;</span>
+<span class="fc" id="L23">        this.stock = stock;</span>
+<span class="fc" id="L24">    }</span>
+
+<span class="fc" id="L26">    public String code() { return code; }</span>
+<span class="fc" id="L27">    public synchronized long priceCents() { return priceCents; }</span>
+<span class="fc" id="L28">    public synchronized int stock() { return stock; }</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">    public synchronized boolean isSoldOut() { return stock == 0; }</span>
+
+    /**
+     * Takes {@code quantity} units if they are all available, at today's price.
+     * Returns empty, changing nothing, for a zero, negative, or unavailable quantity.
+     */
+    synchronized Optional&lt;Order&gt; reserve(String orderId, int quantity) {
+<span class="fc bfc" id="L36" title="All 4 branches covered.">        if (quantity &lt;= 0 || quantity &gt; stock) {</span>
+<span class="fc" id="L37">            return Optional.empty();</span>
+        }
+<span class="fc" id="L39">        stock -= quantity;</span>
+<span class="fc" id="L40">        return Optional.of(new Order(orderId, code, quantity, priceCents));</span>
+    }
+
+    /** Sets the price and returns the previous one. */
+    synchronized long changePrice(long newPriceCents) {
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (newPriceCents &lt; 0) {</span>
+<span class="fc" id="L46">            throw new IllegalArgumentException(&quot;Price must not be negative: &quot; + newPriceCents);</span>
+        }
+<span class="fc" id="L48">        long old = priceCents;</span>
+<span class="fc" id="L49">        priceCents = newPriceCents;</span>
+<span class="fc" id="L50">        return old;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.16.202610240946</span></div></body></html>
