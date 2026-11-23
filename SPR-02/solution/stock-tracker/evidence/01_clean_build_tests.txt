@@ -1,0 +1,271 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.9.2/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :clean
+> Task :compileJava
+> Task :processResources
+> Task :classes
+> Task :resolveMainClassName
+> Task :bootJar
+> Task :jar
+> Task :assemble
+> Task :compileTestJava
+> Task :processTestResources
+> Task :testClasses
+> Task :test
+MigrationTest > v2KeepsRecordsWrittenUnderV1() PASSED
+MigrationTest > allMigrationsApplyToAnEmptyDatabase() PASSED
+OptimisticLockingTest > staleUpdateIsRejectedAndTheSuccessfulUpdateIsPreserved() STANDARD_ERROR
+    Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    WARNING: A Java agent has been loaded dynamically (/Users/isaiahmuli/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.18.17/16c2b8827ef3d3bd0009885203ab81498b04b0a8/byte-buddy-agent-1.18.17.jar)
+    WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+    WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+    WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :test
+OptimisticLockingTest > staleUpdateIsRejectedAndTheSuccessfulUpdateIsPreserved() PASSED
+OptimisticLockingTest > manyStaffUsingTheSameSupplyAtOnceNeverLoseAChange() STANDARD_OUT
+    [concurrency] 12 staff took 1 notebook at once: 2 saved, 10 rejected with ConcurrentStockChangeException, notebooks now 23
+OptimisticLockingTest > manyStaffUsingTheSameSupplyAtOnceNeverLoseAChange() PASSED
+OptimisticLockingTest > twoStaffAtOnceTheSecondIsRejectedAndTheFirstIsKept() PASSED
+RepositoryMappingTest > wildcardCharactersAreMatchedLiterally() STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+RepositoryMappingTest > wildcardCharactersAreMatchedLiterally() PASSED
+RepositoryMappingTest > derivedSearchMatchesPartOfTheNameIgnoringCase() STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+RepositoryMappingTest > derivedSearchMatchesPartOfTheNameIgnoringCase() PASSED
+RepositoryMappingTest > queryMethodFindsProductsInACategory() STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 join product_category c1_0 on p1_0.id=c1_0.product_id join category c1_1 on c1_1.id=c1_0.category_id where lower(c1_1.name)=lower(?) order by p1_0.name
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 join product_category c1_0 on p1_0.id=c1_0.product_id join category c1_1 on c1_1.id=c1_0.category_id where lower(c1_1.name)=lower(?) order by p1_0.name
+RepositoryMappingTest > queryMethodFindsProductsInACategory() PASSED
+RepositoryMappingTest > injectionPayloadInCategoryQueryIsABindParameter() STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 join product_category c1_0 on p1_0.id=c1_0.product_id join category c1_1 on c1_1.id=c1_0.category_id where lower(c1_1.name)=lower(?) order by p1_0.name
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 join product_category c1_0 on p1_0.id=c1_0.product_id join category c1_1 on c1_1.id=c1_0.category_id where lower(c1_1.name)=lower(?) order by p1_0.name
+RepositoryMappingTest > injectionPayloadInCategoryQueryIsABindParameter() PASSED
+RepositoryMappingTest > runsOnPostgres18() STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: show server_version
+RepositoryMappingTest > runsOnPostgres18() PASSED
+RepositoryMappingTest > injectionPayloadsInSearchAreMatchedLiterally(String) > search for ["' OR '1'='1"] returns nothing STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+    Hibernate: select count(*) from product p1_0
+RepositoryMappingTest > injectionPayloadsInSearchAreMatchedLiterally(String) > search for ["' OR '1'='1"] returns nothing PASSED
+RepositoryMappingTest > injectionPayloadsInSearchAreMatchedLiterally(String) > search for ["'; DROP TABLE product; --"] returns nothing STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+    Hibernate: select count(*) from product p1_0
+RepositoryMappingTest > injectionPayloadsInSearchAreMatchedLiterally(String) > search for ["'; DROP TABLE product; --"] returns nothing PASSED
+RepositoryMappingTest > injectionPayloadsInSearchAreMatchedLiterally(String) > search for ["_"] returns nothing STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+    Hibernate: select count(*) from product p1_0
+RepositoryMappingTest > injectionPayloadsInSearchAreMatchedLiterally(String) > search for ["_"] returns nothing PASSED
+RepositoryMappingTest > injectionPayloadsInSearchAreMatchedLiterally(String) > search for ["pens' --"] returns nothing STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name) like upper(?) escape '\' order by p1_0.name
+    Hibernate: select count(*) from product p1_0
+RepositoryMappingTest > injectionPayloadsInSearchAreMatchedLiterally(String) > search for ["pens' --"] returns nothing PASSED
+RepositoryMappingTest > oneToManyHistoryPersistsAndReloadsInOrder() STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name)=upper(?)
+    Hibernate: insert into stock_adjustment (adjusted_at,product_id,quantity_after,quantity_change,reason) values (?,?,?,?,?)
+    Hibernate: insert into stock_adjustment (adjusted_at,product_id,quantity_after,quantity_change,reason) values (?,?,?,?,?)
+    Hibernate: insert into stock_adjustment (adjusted_at,product_id,quantity_after,quantity_change,reason) values (?,?,?,?,?)
+    Hibernate: update product set name=?,quantity=?,version=? where id=? and version=?
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where p1_0.id=?
+    Hibernate: select a1_0.product_id,a1_0.id,a1_0.adjusted_at,a1_0.quantity_after,a1_0.quantity_change,a1_0.reason from stock_adjustment a1_0 where a1_0.product_id=? order by a1_0.adjusted_at,a1_0.id
+    Hibernate: select sa1_0.id,sa1_0.adjusted_at,sa1_0.product_id,sa1_0.quantity_after,sa1_0.quantity_change,sa1_0.reason from stock_adjustment sa1_0 where sa1_0.product_id=? order by sa1_0.adjusted_at,sa1_0.id
+RepositoryMappingTest > oneToManyHistoryPersistsAndReloadsInOrder() PASSED
+RepositoryMappingTest > manyToManyPersistsAndReloadsFromBothSides() STANDARD_OUT
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into category (name) values (?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product (name,quantity,version) values (?,?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: insert into product_category (product_id,category_id) values (?,?)
+    Hibernate: select p1_0.id,p1_0.name,p1_0.quantity,p1_0.version from product p1_0 where upper(p1_0.name)=upper(?)
+    Hibernate: select c1_0.product_id,c1_1.id,c1_1.name from product_category c1_0 join category c1_1 on c1_1.id=c1_0.category_id where c1_0.product_id=?
+    Hibernate: select p1_0.category_id,p1_1.id,p1_1.name,p1_1.quantity,p1_1.version from product_category p1_0 join product p1_1 on p1_1.id=p1_0.product_id where p1_0.category_id=?
+    Hibernate: select p1_0.category_id,p1_1.id,p1_1.name,p1_1.quantity,p1_1.version from product_category p1_0 join product p1_1 on p1_1.id=p1_0.product_id where p1_0.category_id=?
+RepositoryMappingTest > manyToManyPersistsAndReloadsFromBothSides() PASSED
+StockReportQueryCountTest > naiveReportIsNPlusOneAndTheFetchJoinIsOneQuery(int) > 10 products STANDARD_OUT
+    [N+1]  10 products: naive report  11 SQL statements, fixed report 1 SQL statement
+StockReportQueryCountTest > naiveReportIsNPlusOneAndTheFetchJoinIsOneQuery(int) > 10 products PASSED
+StockReportQueryCountTest > naiveReportIsNPlusOneAndTheFetchJoinIsOneQuery(int) > 50 products STANDARD_OUT
+    [N+1]  50 products: naive report  51 SQL statements, fixed report 1 SQL statement
+StockReportQueryCountTest > naiveReportIsNPlusOneAndTheFetchJoinIsOneQuery(int) > 50 products PASSED
+StockReportQueryCountTest > naiveReportIsNPlusOneAndTheFetchJoinIsOneQuery(int) > 200 products STANDARD_OUT
+    [N+1] 200 products: naive report 201 SQL statements, fixed report 1 SQL statement
+StockReportQueryCountTest > naiveReportIsNPlusOneAndTheFetchJoinIsOneQuery(int) > 200 products PASSED
+StockReportQueryCountTest > reportShowsQuantitiesAndCategories() PASSED
+StockServiceTest > duplicateProductNamesAreRefused() PASSED
+StockServiceTest > productsCanBeInSeveralCategoriesAndFoundByCategory() PASSED
+StockServiceTest > slipAppliesEveryLine() PASSED
+StockServiceTest > goingNegativeIsRefusedWithTheReasonAndChangesNothing() PASSED
+StockServiceTest > assigningAnUnknownCategoryChangesNothing() PASSED
+StockServiceTest > zeroNegativeOrUnexplainedAdjustmentsAreRefused() PASSED
+StockServiceTest > unknownProductIsNotFoundAndNothingIsWritten() PASSED
+StockServiceTest > receivingAndUsingUpdateStockAndHistory() PASSED
+StockServiceTest > usingExactlyWhatIsLeftReachesZero() PASSED
+StockServiceTest > searchFindsPartOfANameOrNothing() PASSED
+StockTrackerApplicationTests > flywayBuildsTheSchemaAndHibernateOnlyValidatesIt() PASSED
+TransactionRollbackTest > pitfallAfterTheFixRollbackForUndoesTheWholeSlip() STANDARD_OUT
+    [fixed: rollbackFor = InsufficientStockException] pens = 10, pens history rows = 1
+TransactionRollbackTest > pitfallAfterTheFixRollbackForUndoesTheWholeSlip() PASSED
+TransactionRollbackTest > failedSlipRollsBackTheWriteThatAlreadyHappened() STANDARD_OUT
+    [rollback] during the failed slip: 1 product update and 1 history insert were sent to PostgreSQL; afterwards pens = 10, pens history rows = 1
+TransactionRollbackTest > failedSlipRollsBackTheWriteThatAlreadyHappened() PASSED
+TransactionRollbackTest > pitfallBeforeTheFixCheckedExceptionCommitsHalfTheSlip() STANDARD_OUT
+    [pitfall: plain @Transactional] the slip failed, but pens = 30 and pens history rows = 2
+TransactionRollbackTest > pitfallBeforeTheFixCheckedExceptionCommitsHalfTheSlip() PASSED
+> Task :check
+> Task :build
+BUILD SUCCESSFUL in 24s
+9 actionable tasks: 9 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.2/userguide/configuration_cache_enabling.html
