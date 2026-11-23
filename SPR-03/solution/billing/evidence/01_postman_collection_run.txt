@@ -1,0 +1,280 @@
+newman
+
+SPR-03 acceptance checks
+
+❏ 1. API documents (D1-4)
+↳ Worked example: invoices API document is served
+  GET http://localhost:8081/v3/api-docs [200 OK, 5.63kB, 50ms]
+  ✓  responds 200
+  ✓  is an OpenAPI 3.1 document
+  ✓  documents the versioned paths
+
+↳ Payments API document is served
+  GET http://localhost:8082/v3/api-docs [200 OK, 5.76kB, 24ms]
+  ✓  responds 200
+  ✓  is an OpenAPI 3.1 document
+
+❏ 2. Create and view invoices (D1-1, D1-3)
+↳ Create INV for Harbor Bakery with an Idempotency-Key
+  POST http://localhost:8081/api/v1/invoices [201 Created, 511B, 172ms]
+  ✓  responds 201
+  ✓  Location points at the new invoice
+  ✓  is a draft for Harbor Bakery, $1,200.00
+
+↳ Replay the same create (same key, same details)
+  POST http://localhost:8081/api/v1/invoices [201 Created, 538B, 22ms]
+  ✓  responds 201
+  ✓  returns the original response
+  ✓  marks the replay
+
+↳ Same key with different details is refused
+  POST http://localhost:8081/api/v1/invoices [422 Unprocessable Entity (WebDAV) (RFC 4918), 558B, 17ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 422
+  ✓  problem type is idempotency-key-reused
+
+↳ List shows only one Harbor Bakery invoice so far
+  GET http://localhost:8081/api/v1/invoices [200 OK, 447B, 237ms]
+  ✓  responds 200
+  ✓  the replay created nothing
+
+↳ Create INV for Northside Florist (no key)
+  POST http://localhost:8081/api/v1/invoices [201 Created, 506B, 10ms]
+  ✓  responds 201
+  ✓  is a draft
+
+↳ A new request with identical details is processed normally
+  POST http://localhost:8081/api/v1/invoices [201 Created, 506B, 13ms]
+  ✓  responds 201
+  ✓  creates a second invoice
+
+↳ View the Harbor Bakery invoice
+  GET http://localhost:8081/api/v1/invoices/1001 [200 OK, 445B, 10ms]
+  ✓  responds 200
+  ✓  is INV for Harbor Bakery
+
+↳ An unknown invoice is not found
+  GET http://localhost:8081/api/v1/invoices/9999999 [404 Not Found, 443B, 9ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 404
+  ✓  problem type is not-found
+  ✓  explains why
+
+❏ 3. Invalid invoices are refused (D1-2)
+↳ Incomplete invoice
+  POST http://localhost:8081/api/v1/invoices [400 Bad Request, 628B, 14ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 400
+  ✓  problem type is invalid-request
+  ✓  names every field
+
+↳ Total with three decimals
+  POST http://localhost:8081/api/v1/invoices [400 Bad Request, 524B, 6ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 400
+  ✓  explains why
+
+↳ Malformed JSON
+  POST http://localhost:8081/api/v1/invoices [400 Bad Request, 434B, 6ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 400
+  ✓  explains why
+
+↳ Unknown status
+  PUT http://localhost:8081/api/v1/invoices/1001/status [400 Bad Request, 450B, 9ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 400
+  ✓  explains why
+
+❏ 4. Send and status rules (D1-1, D1-3)
+↳ No payment link for a draft
+  POST http://localhost:8082/api/v1/payment-links [409 Conflict, 505B, 137ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 409
+  ✓  problem type is invalid-state
+
+↳ Draft cannot become paid
+  PUT http://localhost:8081/api/v1/invoices/1002/status [409 Conflict, 498B, 35ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 409
+  ✓  problem type is invalid-state
+
+↳ Send the Harbor Bakery invoice
+  PUT http://localhost:8081/api/v1/invoices/1001/status [200 OK, 444B, 17ms]
+  ✓  responds 200
+  ✓  is sent
+
+↳ Send it again: succeeds and changes nothing
+  PUT http://localhost:8081/api/v1/invoices/1001/status [200 OK, 444B, 9ms]
+  ✓  responds 200
+  ✓  unchanged
+
+↳ A sent invoice cannot be deleted
+  DELETE http://localhost:8081/api/v1/invoices/1001 [409 Conflict, 503B, 10ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 409
+  ✓  problem type is invalid-state
+
+❏ 5. Payment link (D1-5)
+↳ Get the payment link for the sent invoice
+  POST http://localhost:8082/api/v1/payment-links [201 Created, 477B, 503ms]
+  ✓  responds 201
+  ✓  Location points at the link
+  ✓  has a provider checkout and URL
+
+↳ Ask again: the same link
+  POST http://localhost:8082/api/v1/payment-links [200 OK, 413B, 15ms]
+  ✓  responds 200
+  ✓  same URL
+
+↳ View the payment link
+  GET http://localhost:8082/api/v1/payment-links/1001 [200 OK, 406B, 7ms]
+  ✓  responds 200
+
+↳ No payment link for an unknown invoice
+  POST http://localhost:8082/api/v1/payment-links [404 Not Found, 440B, 13ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 404
+  ✓  problem type is not-found
+
+❏ 6. The customer pays
+↳ A part payment is not applied
+  POST http://localhost:8082/api/v1/payment-reports [422 Unprocessable Entity (WebDAV) (RFC 4918), 549B, 31ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 422
+  ✓  problem type is cannot-apply
+
+↳ Provider: send the sample payment report
+  POST http://localhost:8082/api/v1/payment-reports [200 OK, 371B, 35ms]
+  ✓  responds 200
+  ✓  applied
+
+↳ The provider resends the same report: no further effect
+  POST http://localhost:8082/api/v1/payment-reports [200 OK, 398B, 8ms]
+  ✓  responds 200
+  ✓  same answer
+  ✓  marks the replay
+
+↳ The invoice shows as paid
+  GET http://localhost:8081/api/v1/invoices/1001 [200 OK, 444B, 6ms]
+  ✓  responds 200
+  ✓  is paid
+
+↳ Same eventId with different content is refused
+  POST http://localhost:8082/api/v1/payment-reports [422 Unprocessable Entity (WebDAV) (RFC 4918), 563B, 8ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 422
+  ✓  problem type is idempotency-key-reused
+
+↳ A report for an unknown checkout is not applied
+  POST http://localhost:8082/api/v1/payment-reports [422 Unprocessable Entity (WebDAV) (RFC 4918), 503B, 10ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 422
+  ✓  explains why
+
+↳ A paid invoice cannot be cancelled
+  PUT http://localhost:8081/api/v1/invoices/1001/status [409 Conflict, 502B, 8ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 409
+  ✓  problem type is invalid-state
+
+↳ No payment link for a paid invoice
+  POST http://localhost:8082/api/v1/payment-links [409 Conflict, 504B, 11ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 409
+  ✓  problem type is invalid-state
+
+❏ 7. Cancel and delete (D1-1, D1-3)
+↳ Cancel the Northside Florist draft
+  PUT http://localhost:8081/api/v1/invoices/1002/status [200 OK, 444B, 11ms]
+  ✓  responds 200
+  ✓  is cancelled
+
+↳ Cancel it again: succeeds and changes nothing
+  PUT http://localhost:8081/api/v1/invoices/1002/status [200 OK, 444B, 12ms]
+  ✓  responds 200
+  ✓  still cancelled
+
+↳ No payment link for a cancelled invoice
+  POST http://localhost:8082/api/v1/payment-links [409 Conflict, 509B, 13ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 409
+
+↳ A cancelled invoice cannot be deleted
+  DELETE http://localhost:8081/api/v1/invoices/1002 [409 Conflict, 508B, 7ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 409
+  ✓  problem type is invalid-state
+
+↳ Create, send, then cancel a sent invoice: create
+  POST http://localhost:8081/api/v1/invoices [201 Created, 506B, 10ms]
+  ✓  responds 201
+
+↳ Create, send, then cancel a sent invoice: send
+  PUT http://localhost:8081/api/v1/invoices/1004/status [200 OK, 439B, 11ms]
+  ✓  responds 200
+
+↳ Create, send, then cancel a sent invoice: cancel
+  PUT http://localhost:8081/api/v1/invoices/1004/status [200 OK, 444B, 10ms]
+  ✓  responds 200
+  ✓  is cancelled
+
+↳ Delete a draft
+  DELETE http://localhost:8081/api/v1/invoices/1003 [204 No Content, 201B, 16ms]
+  ✓  responds 204
+  ✓  has no body
+
+↳ The deleted draft is gone
+  GET http://localhost:8081/api/v1/invoices/1003 [404 Not Found, 437B, 5ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 404
+
+↳ Delete it again: nothing more happens
+  DELETE http://localhost:8081/api/v1/invoices/1003 [404 Not Found, 437B, 6ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 404
+  ✓  problem type is not-found
+
+❏ 8. Browser access (D1-7)
+↳ Invoices: preflight from the billing web app
+  OPTIONS http://localhost:8081/api/v1/invoices [200 OK, 474B, 6ms]
+  ✓  responds 200
+  ✓  allows the billing web app
+
+↳ Invoices: preflight from another website
+  OPTIONS http://localhost:8081/api/v1/invoices [403 Forbidden, 441B, 2ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 403
+  ✓  problem type is cors-rejected
+  ✓  no CORS grant
+
+↳ Payments: preflight from the billing web app
+  OPTIONS http://localhost:8082/api/v1/payment-links [200 OK, 425B, 3ms]
+  ✓  responds 200
+  ✓  allows the billing web app
+
+↳ Payments: preflight from another website
+  OPTIONS http://localhost:8082/api/v1/payment-links [403 Forbidden, 441B, 4ms]
+  ✓  refusal is application/problem+json with type, title, status and detail
+  ✓  responds 403
+  ✓  problem type is cors-rejected
+
+┌─────────────────────────┬───────────────────┬──────────────────┐
+│                         │          executed │           failed │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              iterations │                 1 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│                requests │                45 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│            test-scripts │                90 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│      prerequest-scripts │                 3 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              assertions │               114 │                0 │
+├─────────────────────────┴───────────────────┴──────────────────┤
+│ total run duration: 2.1s                                       │
+├────────────────────────────────────────────────────────────────┤
+│ total data received: 19.29kB (approx)                          │
+├────────────────────────────────────────────────────────────────┤
+│ average response time: 35ms [min: 2ms, max: 503ms, s.d.: 83ms] │
+└────────────────────────────────────────────────────────────────┘

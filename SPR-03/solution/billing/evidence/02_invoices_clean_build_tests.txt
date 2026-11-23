@@ -1,0 +1,102 @@
+# invoices: ./gradlew clean build from a fresh copy (no build/ or .gradle/), PostgreSQL 18 from compose.yaml
+
+> Task :clean
+> Task :compileJava
+> Task :processResources
+> Task :classes
+> Task :resolveMainClassName
+> Task :bootJar
+> Task :jar
+> Task :assemble
+> Task :compileTestJava
+> Task :processTestResources
+> Task :testClasses
+
+> Task :test
+
+CorsTest > aMethodTheAppDoesNotUseIsRejected() STANDARD_ERROR
+    Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    WARNING: A Java agent has been loaded dynamically (~/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.18.15/de6980bb799c25bb1fe9e6c434201299cb5e694e/byte-buddy-agent-1.18.15.jar)
+    WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+    WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+    WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :test
+
+CorsTest > aMethodTheAppDoesNotUseIsRejected() PASSED
+
+CorsTest > preflightFromTheBillingAppGetsTheMethodsAndHeadersItNeeds() PASSED
+
+CorsTest > preflightFromAnUnlistedOriginIsRejected() PASSED
+
+CorsTest > actualRequestsFromTheBillingAppCanReadTheLocationHeader() PASSED
+
+IdempotencyTest > theSameKeyWithDifferentContentIsRefusedAndCreatesNothing() PASSED
+
+IdempotencyTest > theReplayIsTheOriginalResponseEvenAfterTheInvoiceChanged() PASSED
+
+IdempotencyTest > replayingACreateWithTheSameKeyReturnsTheOriginalResponseAndCreatesNothing() STANDARD_OUT
+    [idempotency] replay with key d85d9508 returned the original invoice INV-1032; invoices before 27, after 27
+
+IdempotencyTest > replayingACreateWithTheSameKeyReturnsTheOriginalResponseAndCreatesNothing() PASSED
+
+IdempotencyTest > aNewRequestWithIdenticalDetailsIsProcessedNormally() PASSED
+
+IdempotencyTest > twoSimultaneousRequestsWithOneKeyCreateOneInvoice() STANDARD_OUT
+    2026-11-23T19:26:20.215+03:00  WARN 54264 --- [invoices] [pool-2-thread-2] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 23505
+    2026-11-23T19:26:20.215+03:00  WARN 54264 --- [invoices] [pool-2-thread-4] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 23505
+    2026-11-23T19:26:20.216+03:00  WARN 54264 --- [invoices] [pool-2-thread-2] org.hibernate.orm.jdbc.error             : ERROR: duplicate key value violates unique constraint "idempotency_record_pkey"
+      Detail: Key (idempotency_key)=(62bd2778-b6a0-4227-be8b-cf9b1fd05b47) already exists.
+    2026-11-23T19:26:20.216+03:00  WARN 54264 --- [invoices] [pool-2-thread-4] org.hibernate.orm.jdbc.error             : ERROR: duplicate key value violates unique constraint "idempotency_record_pkey"
+      Detail: Key (idempotency_key)=(62bd2778-b6a0-4227-be8b-cf9b1fd05b47) already exists.
+    2026-11-23T19:26:20.215+03:00  WARN 54264 --- [invoices] [pool-2-thread-3] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 23505
+    2026-11-23T19:26:20.216+03:00  WARN 54264 --- [invoices] [pool-2-thread-3] org.hibernate.orm.jdbc.error             : ERROR: duplicate key value violates unique constraint "idempotency_record_pkey"
+      Detail: Key (idempotency_key)=(62bd2778-b6a0-4227-be8b-cf9b1fd05b47) already exists.
+
+IdempotencyTest > twoSimultaneousRequestsWithOneKeyCreateOneInvoice() PASSED
+
+IdempotencyTest > aBlankKeyIsRefused() PASSED
+
+InvoiceApiTest > unknownInvoiceIs404ProblemJson() PASSED
+
+InvoiceApiTest > totalWithThreeDecimalsOrNegativeIsRefused() PASSED
+
+InvoiceApiTest > createReturns201WithLocationAndADraftThatMatchesTheSchema() PASSED
+
+InvoiceApiTest > incompleteInvoiceIsRefusedNamingEveryField() PASSED
+
+InvoiceApiTest > deletingADraftIs204AndASecondDeleteChangesNothing() PASSED
+
+InvoiceApiTest > onlyDraftsCanBeDeleted() PASSED
+
+InvoiceApiTest > malformedJsonAndWrongTypesAreRefusedWithoutInternals() PASSED
+
+InvoiceApiTest > settingTheSameStatusAgainSucceedsAndChangesNothing() PASSED
+
+InvoiceApiTest > listShowsInvoicesInOrder() PASSED
+
+InvoiceApiTest > springsOwnRefusalsUseTheSameFormat() STANDARD_OUT
+    2026-11-23T19:26:20.410+03:00  WARN 54264 --- [invoices] [    Test worker] o.s.web.servlet.PageNotFound             : Request method 'DELETE' is not supported
+
+InvoiceApiTest > springsOwnRefusalsUseTheSameFormat() PASSED
+
+InvoiceApiTest > draftOrSentInvoicesCanBeCancelled() PASSED
+
+InvoiceApiTest > draftIsSentThenPaid() PASSED
+
+InvoiceApiTest > forbiddenStatusChangesAre409() PASSED
+
+InvoicesApplicationTests > contextLoads() PASSED
+
+OpenApiDocumentTest > theValidatorRejectsBodiesThatDoNotMatch() PASSED
+
+OpenApiDocumentTest > servesOpenApi31WithTheVersionedPaths() PASSED
+
+> Task :check
+> Task :build
+
+BUILD SUCCESSFUL in 7s
+9 actionable tasks: 9 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.1/userguide/configuration_cache_enabling.html
