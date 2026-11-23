@@ -9,6 +9,25 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+  http:
+    serviceclient:
+      # Calls to other services: base URL and timeouts per environment (see application-staging.yaml).
+      invoices:
+        base-url: http://localhost:8081
+        connect-timeout: 1s
+        read-timeout: 3s
+      provider:
+        base-url: http://localhost:8089
+        connect-timeout: 1s
+        read-timeout: 3s
 
 server:
   port: 8082
+
+billing:
+  cors:
+    allowed-origins: https://billing.example.com
+
+springdoc:
+  api-docs:
+    version: openapi_3_1

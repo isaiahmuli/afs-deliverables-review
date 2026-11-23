@@ -36,7 +36,7 @@ public class InvoicesGateway {
     public InvoiceView markPaid(long invoiceId) {
         return Downstream.call("invoices service", () -> {
             try {
-                return client.changeStatus(invoiceId, new StatusChange("PAID"));
+                return client.changeStatus(invoiceId, new StatusChange(InvoiceStatus.PAID));
             } catch (HttpClientErrorException.Conflict e) {
                 throw new StatusChangeRefused();
             }

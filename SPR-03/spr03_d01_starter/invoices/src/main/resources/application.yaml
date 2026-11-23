@@ -12,3 +12,11 @@ spring:
 
 server:
   port: 8081
+
+billing:
+  cors:
+    allowed-origins: https://billing.example.com
+
+springdoc:
+  api-docs:
+    version: openapi_3_1

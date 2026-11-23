@@ -19,7 +19,7 @@ docker compose up -d                          # PostgreSQL 18 + the provider sta
 cd invoices && ./gradlew bootRun              # http://localhost:8081
 cd payments && ./gradlew bootRun              # http://localhost:8082
 cd invoices && ./gradlew build                # 26 JUnit tests
-cd payments && ./gradlew build                # 19 JUnit tests (WireMock plays invoices and the provider)
+cd payments && ./gradlew build                # 20 JUnit tests (WireMock plays invoices and the provider)
 ```
 
 Acceptance checks: import `postman/spr03-acceptance.postman_collection.json` and
@@ -36,14 +36,14 @@ started the services with `SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:543
 |---|---|
 | `evidence/01_postman_collection_run.txt` / `.json` | Collection Runner results (Newman CLI and JSON export): 45 requests, 114 assertions, 0 failed |
 | `evidence/02_invoices_clean_build_tests.txt` | `./gradlew clean build` from a fresh copy: 26 tests passed |
-| `evidence/03_payments_clean_build_tests.txt` | `./gradlew clean build` from a fresh copy: 19 tests passed |
+| `evidence/03_payments_clean_build_tests.txt` | `./gradlew clean build` from a fresh copy: 20 tests passed |
 
 Printed lines from the tests:
 
 ```text
 [idempotency] replay with key d85d9508 returned the original invoice INV-1032; invoices before 27, after 27
 [timeout] invoices delayed 6 s: payments answered 504 after 3.01 s
-[report replay] evt-2e641a8c sent 3 times: applied once, 0 calls to invoices for the 2 resends
+[report replay] evt-771233bb sent 3 times: applied once, 0 calls to invoices for the 2 resends
 ```
 
 ## How each exit criterion is met

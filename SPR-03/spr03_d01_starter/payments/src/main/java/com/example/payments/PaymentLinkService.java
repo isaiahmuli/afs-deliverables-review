@@ -1,5 +1,6 @@
 package com.example.payments;
 
+import com.example.payments.clients.InvoiceStatus;
 import com.example.payments.clients.InvoicesClient.InvoiceView;
 import com.example.payments.clients.InvoicesGateway;
 import com.example.payments.clients.ProviderClient.Checkout;
@@ -35,7 +36,7 @@ public class PaymentLinkService {
     public Result linkFor(long invoiceId) {
         InvoiceView invoice = invoices.find(invoiceId).orElseThrow(() -> new NotFoundException(
                 "Invoice INV-%d does not exist.".formatted(invoiceId)));
-        if (!"SENT".equals(invoice.status())) {
+        if (invoice.status() != InvoiceStatus.SENT) {
             throw new InvalidStateException("Invoice %s is %s; a payment link needs a sent invoice."
                     .formatted(invoice.number(), invoice.status()));
         }

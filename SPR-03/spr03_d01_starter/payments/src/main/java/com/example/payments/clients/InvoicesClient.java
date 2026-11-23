@@ -17,9 +17,9 @@ public interface InvoicesClient {
     @PutExchange("/{id}/status")
     InvoiceView changeStatus(@PathVariable long id, @RequestBody StatusChange change);
 
-    record InvoiceView(long id, String number, BigDecimal total, String currency, String status) {
+    record InvoiceView(long id, String number, BigDecimal total, String currency, InvoiceStatus status) {
     }
 
-    record StatusChange(String status) {
+    record StatusChange(InvoiceStatus status) {
     }
 }

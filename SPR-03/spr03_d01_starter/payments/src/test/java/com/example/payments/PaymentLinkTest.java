@@ -55,6 +55,17 @@ class PaymentLinkTest extends PaymentsTestSupport {
         downstream.verify(0, postRequestedFor(urlEqualTo("/checkouts")));
     }
 
+    /** A status invoices might add later is refused cleanly instead of breaking the call. */
+    @Test
+    void anInvoiceStatusPaymentsDoesNotKnowIsRefused() throws Exception {
+        long id = newInvoiceId();
+        stubInvoice(id, "ARCHIVED", "340.00");
+        requestLink(id).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value("Invoice INV-%d is UNKNOWN; a payment link needs a sent invoice."
+                        .formatted(id)));
+        downstream.verify(0, postRequestedFor(urlEqualTo("/checkouts")));
+    }
+
     @Test
     void anUnknownInvoiceIs404() throws Exception {
         long id = newInvoiceId();
