@@ -1,0 +1,6 @@
+{
+  "eventId": "evt-0001",
+  "checkoutId": "chk-INV-1001",
+  "status": "paid",
+  "amountCents": 120000
+}

@@ -61,10 +61,20 @@ well. Quote what you actually saw (test counts, output lines, error messages).
   intro sentence (the starter belongs in the Overview paragraph).
 - Use exactly these sections, in this order: Overview, Concerns, Summary. No "At a glance"
   table and no separate "Suggested changes" line (that list is the "Changes needed" bullet).
+- Write it the way a person talks to a colleague: plain words, full sentences, "I" and "you",
+  and explain the technical cause in everyday terms. Avoid clipped, note-style fragments.
+  Describe what happens rather than "my" code or calls ("Calls to the provider kept failing",
+  not "My calls to the provider kept failing").
+- Keep it short. Overview: two or three sentences and three bullets. Each concern: two to four
+  lines saying what goes wrong and the fix. Put detail in the solution's `SUBMISSION.md`.
 - Do not include a walkthrough, an exit-criteria table, an evidence dump, or a prerequisites
   section. Detailed evidence belongs in the solution (for example its `SUBMISSION.md`).
-- If the realistic time is over the budget, that is the first concern ("Time (high impact)").
-- Order the points by impact: the time limit, setup blockers, and anything that makes an exit
+- Trainees work with AI assistants, so estimate the realistic time for a SWE1 using AI, not one
+  writing everything by hand. A trap that AI is unlikely to diagnose still costs real time.
+- State the realistic time in the Overview paragraph and the Summary. Add Time as a concern only
+  when it is really necessary, for example when the scope cannot fit the budget without being cut
+  or split; then it goes first.
+- Order the points by impact: setup blockers, and anything that makes an exit
   criterion ungradeable or makes a trainee who solves the stated problem still fail a criterion.
 - Each point should say what a trainee would actually do or get wrong, and how you know (what
   happened when you did it).

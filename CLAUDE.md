@@ -18,8 +18,9 @@ One folder per deliverable, named by its curriculum code (for example `AI-01/`, 
 ```
 <CODE>/
   deliverable-instructions.md   # what the trainee sees (source of truth; may be .yml in older ones)
-  starter/                      # only if the deliverable says starter files are supplied
-  solution/                     # our attempt, done as a trainee would
+  <code>_d01_starter/           # the supplied starter (only if the deliverable supplies one);
+                                #   our work goes INSIDE it, as a trainee's would
+  solution/                     # our attempt, only when no starter is supplied
   <CODE>-deliverable-feedback.md  # private feedback, see guideline.md (older folders: report.md)
 ```
 
@@ -38,14 +39,17 @@ moving or deleting anything a previous session produced.
 
 1. If the instructions reference starter files and they are not in the folder, stop and ask for
    them. Never write a stand-in starter.
-2. Respect the deliverable's rules exactly: required versions, tools, scope, what is in and out,
+2. When a starter is supplied, build the solution inside the starter folder, changing its files
+   the way a trainee would. Do not copy it into a separate `solution/` folder. Use `solution/`
+   only when no starter is supplied. (JAVA-01 to JAVA-03 and SQL-02 predate this rule.)
+3. Respect the deliverable's rules exactly: required versions, tools, scope, what is in and out,
    and the time budget. Do not add work outside scope to make the solution look better.
-3. Use current, real versions. Check Maven Central, PyPI, Docker Hub, or start.spring.io rather
+4. Use current, real versions. Check Maven Central, PyPI, Docker Hub, or start.spring.io rather
    than relying on memory, and name exact versions.
-4. Verify what can be verified: run builds, tests, or connection checks, and keep the output as
+5. Verify what can be verified: run builds, tests, or connection checks, and keep the output as
    evidence. If something could not be verified, say so plainly.
-5. Do not commit or push unless the user asks. A trainee repo inside `solution/` may be
-   `git init`-ed but is left uncommitted unless the user asks.
+6. Do not commit or push unless the user asks. A trainee repo inside the starter or `solution/`
+   may be `git init`-ed but is left uncommitted unless the user asks.
 
 ## Environment notes
 

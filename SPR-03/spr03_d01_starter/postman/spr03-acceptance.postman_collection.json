@@ -1,0 +1,1544 @@
+{
+  "info": {
+    "name": "SPR-03 acceptance checks",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Acceptance checks A1-A14 from docs/SPEC.md, run in order against the running services. Start from an empty database (docker compose down -v; docker compose up -d)."
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// D1-2: every refusal from either service uses the same problem+json contract.",
+          "if (pm.response.code >= 400) {",
+          "    pm.test('refusal is application/problem+json with type, title, status and detail', () => {",
+          "        pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+          "        const problem = pm.response.json();",
+          "        pm.expect(problem).to.include.keys('type', 'title', 'status', 'detail');",
+          "        pm.expect(problem.status).to.eql(pm.response.code);",
+          "        pm.expect(JSON.stringify(problem)).to.not.match(/Exception|at com\\.|SQL/);",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "1. API documents (D1-4)",
+      "description": "",
+      "item": [
+        {
+          "name": "Worked example: invoices API document is served",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/v3/api-docs"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('is an OpenAPI 3.1 document', () => {",
+                  "    pm.expect(pm.response.json().openapi).to.match(/^3\\.1/);",
+                  "});",
+                  "pm.test('documents the versioned paths', () => pm.expect(Object.keys(pm.response.json().paths)).to.include('/api/v1/invoices/{id}/status'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payments API document is served",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{paymentsBaseUrl}}/v3/api-docs"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('is an OpenAPI 3.1 document', () => pm.expect(pm.response.json().openapi).to.match(/^3\\.1/));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Create and view invoices (D1-1, D1-3)",
+      "description": "",
+      "item": [
+        {
+          "name": "Create INV for Harbor Bakery with an Idempotency-Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{createKey}}"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": \"Harbor Bakery\",\n  \"description\": \"40 hours of bookkeeping, October\",\n  \"total\": 1200.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('createKey', pm.variables.replaceIn('{{$guid}}'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 201', () => pm.response.to.have.status(201));",
+                  "const invoice = pm.response.json();",
+                  "pm.test('Location points at the new invoice', () => pm.expect(pm.response.headers.get('Location')).to.match(new RegExp('/api/v1/invoices/' + invoice.id + '$')));",
+                  "pm.test('is a draft for Harbor Bakery, $1,200.00', () => {",
+                  "    pm.expect(invoice.status).to.eql('DRAFT');",
+                  "    pm.expect(invoice.customer).to.eql('Harbor Bakery');",
+                  "    pm.expect(invoice.total).to.eql(1200);",
+                  "    pm.expect(invoice.number).to.eql('INV-' + invoice.id);",
+                  "});",
+                  "pm.collectionVariables.set('harborId', invoice.id);",
+                  "pm.collectionVariables.set('harborCreateResponse', pm.response.text());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Replay the same create (same key, same details)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{createKey}}"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": \"Harbor Bakery\",\n  \"description\": \"40 hours of bookkeeping, October\",\n  \"total\": 1200.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 201', () => pm.response.to.have.status(201));",
+                  "pm.test('returns the original response', () => pm.expect(pm.response.text()).to.eql(pm.collectionVariables.get('harborCreateResponse')));",
+                  "pm.test('marks the replay', () => pm.expect(pm.response.headers.get('Idempotent-Replayed')).to.eql('true'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Same key with different details is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{createKey}}"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": \"Northside Florist\",\n  \"description\": \"Quarterly payroll filing\",\n  \"total\": 340.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 422', () => pm.response.to.have.status(422));",
+                  "pm.test('problem type is idempotency-key-reused', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/idempotency-key-reused'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List shows only one Harbor Bakery invoice so far",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('the replay created nothing', () => pm.expect(pm.response.json().filter(i => i.customer === 'Harbor Bakery').length).to.eql(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create INV for Northside Florist (no key)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": \"Northside Florist\",\n  \"description\": \"Quarterly payroll filing\",\n  \"total\": 340.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 201', () => pm.response.to.have.status(201));",
+                  "pm.test('is a draft', () => pm.expect(pm.response.json().status).to.eql('DRAFT'));",
+                  "pm.collectionVariables.set('floristId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A new request with identical details is processed normally",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": \"Northside Florist\",\n  \"description\": \"Quarterly payroll filing\",\n  \"total\": 340.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 201', () => pm.response.to.have.status(201));",
+                  "pm.test('creates a second invoice', () => pm.expect(pm.response.json().id).to.not.eql(Number(pm.collectionVariables.get('floristId'))));",
+                  "pm.collectionVariables.set('spareDraftId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "View the Harbor Bakery invoice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{harborId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('is INV for Harbor Bakery', () => pm.expect(pm.response.json().customer).to.eql('Harbor Bakery'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "An unknown invoice is not found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/9999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 404', () => pm.response.to.have.status(404));",
+                  "pm.test('problem type is not-found', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/not-found'));",
+                  "pm.test('explains why', () => pm.expect(pm.response.json().detail).to.eql(\"Invoice INV-9999999 does not exist.\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Invalid invoices are refused (D1-2)",
+      "description": "",
+      "item": [
+        {
+          "name": "Incomplete invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"customer\": \"  \", \"total\": 0 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 400', () => pm.response.to.have.status(400));",
+                  "pm.test('problem type is invalid-request', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/invalid-request'));",
+                  "pm.test('names every field', () => pm.expect(pm.response.json().errors.map(e => e.field)).to.eql(['customer', 'description', 'total']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Total with three decimals",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"customer\": \"Harbor Bakery\", \"description\": \"Bookkeeping\", \"total\": 12.345 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 400', () => pm.response.to.have.status(400));",
+                  "pm.test('explains why', () => pm.expect(pm.response.json().detail).to.eql(\"Fix these fields: total must have at most two decimal places.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Malformed JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"customer\": ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 400', () => pm.response.to.have.status(400));",
+                  "pm.test('explains why', () => pm.expect(pm.response.json().detail).to.eql(\"The request body is missing or is not valid JSON.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unknown status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{harborId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"SHIPPED\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 400', () => pm.response.to.have.status(400));",
+                  "pm.test('explains why', () => pm.expect(pm.response.json().detail).to.eql(\"status must be one of [DRAFT, SENT, PAID, CANCELLED].\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Send and status rules (D1-1, D1-3)",
+      "description": "",
+      "item": [
+        {
+          "name": "No payment link for a draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentsBaseUrl}}/api/v1/payment-links",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"invoiceId\": {{harborId}} }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 409', () => pm.response.to.have.status(409));",
+                  "pm.test('problem type is invalid-state', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/invalid-state'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Draft cannot become paid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{floristId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"PAID\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 409', () => pm.response.to.have.status(409));",
+                  "pm.test('problem type is invalid-state', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/invalid-state'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send the Harbor Bakery invoice",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{harborId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"SENT\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('is sent', () => pm.expect(pm.response.json().status).to.eql('SENT'));",
+                  "pm.collectionVariables.set('harborSent', pm.response.text());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send it again: succeeds and changes nothing",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{harborId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"SENT\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('unchanged', () => pm.expect(pm.response.text()).to.eql(pm.collectionVariables.get('harborSent')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A sent invoice cannot be deleted",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{harborId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 409', () => pm.response.to.have.status(409));",
+                  "pm.test('problem type is invalid-state', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/invalid-state'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Payment link (D1-5)",
+      "description": "",
+      "item": [
+        {
+          "name": "Get the payment link for the sent invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentsBaseUrl}}/api/v1/payment-links",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"invoiceId\": {{harborId}} }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 201', () => pm.response.to.have.status(201));",
+                  "const link = pm.response.json();",
+                  "pm.test('Location points at the link', () => pm.expect(pm.response.headers.get('Location')).to.match(/\\/api\\/v1\\/payment-links\\/\\d+$/));",
+                  "pm.test('has a provider checkout and URL', () => {",
+                  "    pm.expect(link.checkoutId).to.eql('chk-' + link.invoiceNumber);",
+                  "    pm.expect(link.url).to.eql('https://pay.example.com/' + link.checkoutId);",
+                  "});",
+                  "pm.collectionVariables.set('checkoutId', link.checkoutId);",
+                  "pm.collectionVariables.set('paymentUrl', link.url);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ask again: the same link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentsBaseUrl}}/api/v1/payment-links",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"invoiceId\": {{harborId}} }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('same URL', () => pm.expect(pm.response.json().url).to.eql(pm.collectionVariables.get('paymentUrl')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "View the payment link",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{paymentsBaseUrl}}/api/v1/payment-links/{{harborId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No payment link for an unknown invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentsBaseUrl}}/api/v1/payment-links",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"invoiceId\": 9999999 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 404', () => pm.response.to.have.status(404));",
+                  "pm.test('problem type is not-found', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/not-found'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. The customer pays",
+      "description": "",
+      "item": [
+        {
+          "name": "A part payment is not applied",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentReportUrl}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"{{partEventId}}\",\n  \"checkoutId\": \"{{checkoutId}}\",\n  \"status\": \"paid\",\n  \"amountCents\": 100000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('partEventId', 'evt-' + pm.variables.replaceIn('{{$guid}}'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 422', () => pm.response.to.have.status(422));",
+                  "pm.test('problem type is cannot-apply', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/cannot-apply'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Provider: send the sample payment report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentReportUrl}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"{{eventId}}\",\n  \"checkoutId\": \"{{checkoutId}}\",\n  \"status\": \"paid\",\n  \"amountCents\": 120000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('eventId', 'evt-' + pm.variables.replaceIn('{{$guid}}'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('applied', () => pm.expect(pm.response.json().outcome).to.eql('APPLIED'));",
+                  "pm.collectionVariables.set('reportResponse', pm.response.text());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "The provider resends the same report: no further effect",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentReportUrl}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"{{eventId}}\",\n  \"checkoutId\": \"{{checkoutId}}\",\n  \"status\": \"paid\",\n  \"amountCents\": 120000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('same answer', () => pm.expect(pm.response.text()).to.eql(pm.collectionVariables.get('reportResponse')));",
+                  "pm.test('marks the replay', () => pm.expect(pm.response.headers.get('Idempotent-Replayed')).to.eql('true'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "The invoice shows as paid",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{harborId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('is paid', () => pm.expect(pm.response.json().status).to.eql('PAID'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Same eventId with different content is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentReportUrl}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"{{eventId}}\",\n  \"checkoutId\": \"{{checkoutId}}\",\n  \"status\": \"paid\",\n  \"amountCents\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 422', () => pm.response.to.have.status(422));",
+                  "pm.test('problem type is idempotency-key-reused', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/idempotency-key-reused'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A report for an unknown checkout is not applied",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentReportUrl}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"evt-unknown-{{$timestamp}}\",\n  \"checkoutId\": \"chk-nobody\",\n  \"status\": \"paid\",\n  \"amountCents\": 120000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 422', () => pm.response.to.have.status(422));",
+                  "pm.test('explains why', () => pm.expect(pm.response.json().detail).to.eql(\"Checkout chk-nobody is not one of ours.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A paid invoice cannot be cancelled",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{harborId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"CANCELLED\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 409', () => pm.response.to.have.status(409));",
+                  "pm.test('problem type is invalid-state', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/invalid-state'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No payment link for a paid invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentsBaseUrl}}/api/v1/payment-links",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"invoiceId\": {{harborId}} }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 409', () => pm.response.to.have.status(409));",
+                  "pm.test('problem type is invalid-state', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/invalid-state'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Cancel and delete (D1-1, D1-3)",
+      "description": "",
+      "item": [
+        {
+          "name": "Cancel the Northside Florist draft",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{floristId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"CANCELLED\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('is cancelled', () => pm.expect(pm.response.json().status).to.eql('CANCELLED'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel it again: succeeds and changes nothing",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{floristId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"CANCELLED\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('still cancelled', () => pm.expect(pm.response.json().status).to.eql('CANCELLED'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No payment link for a cancelled invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{paymentsBaseUrl}}/api/v1/payment-links",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"invoiceId\": {{floristId}} }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A cancelled invoice cannot be deleted",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{floristId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 409', () => pm.response.to.have.status(409));",
+                  "pm.test('problem type is invalid-state', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/invalid-state'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create, send, then cancel a sent invoice: create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": \"Northside Florist\",\n  \"description\": \"Quarterly payroll filing\",\n  \"total\": 340.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('sentToCancelId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create, send, then cancel a sent invoice: send",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{sentToCancelId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"SENT\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create, send, then cancel a sent invoice: cancel",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{sentToCancelId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"CANCELLED\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('is cancelled', () => pm.expect(pm.response.json().status).to.eql('CANCELLED'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete a draft",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{spareDraftId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 204', () => pm.response.to.have.status(204));",
+                  "pm.test('has no body', () => pm.expect(pm.response.text()).to.eql(''));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "The deleted draft is gone",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{spareDraftId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete it again: nothing more happens",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices/{{spareDraftId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 404', () => pm.response.to.have.status(404));",
+                  "pm.test('problem type is not-found', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/not-found'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. Browser access (D1-7)",
+      "description": "",
+      "item": [
+        {
+          "name": "Invoices: preflight from the billing web app",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "{{webAppOrigin}}"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              },
+              {
+                "key": "Access-Control-Request-Headers",
+                "value": "Content-Type, Idempotency-Key"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('allows the billing web app', () => {",
+                  "    pm.expect(pm.response.headers.get('Access-Control-Allow-Origin')).to.eql(pm.environment.get('webAppOrigin'));",
+                  "    pm.expect(pm.response.headers.get('Access-Control-Allow-Methods')).to.eql('GET,POST,PUT,DELETE');",
+                  "    pm.expect(pm.response.headers.get('Access-Control-Allow-Headers')).to.eql('Content-Type, Idempotency-Key');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invoices: preflight from another website",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "https://evil.example.com"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              }
+            ],
+            "url": "{{invoicesBaseUrl}}/api/v1/invoices"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 403', () => pm.response.to.have.status(403));",
+                  "pm.test('problem type is cors-rejected', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/cors-rejected'));",
+                  "pm.test('no CORS grant', () => pm.expect(pm.response.headers.has('Access-Control-Allow-Origin')).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payments: preflight from the billing web app",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "{{webAppOrigin}}"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              },
+              {
+                "key": "Access-Control-Request-Headers",
+                "value": "Content-Type"
+              }
+            ],
+            "url": "{{paymentsBaseUrl}}/api/v1/payment-links"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 200', () => pm.response.to.have.status(200));",
+                  "pm.test('allows the billing web app', () => pm.expect(pm.response.headers.get('Access-Control-Allow-Origin')).to.eql(pm.environment.get('webAppOrigin')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payments: preflight from another website",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "https://evil.example.com"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              }
+            ],
+            "url": "{{paymentsBaseUrl}}/api/v1/payment-links"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responds 403', () => pm.response.to.have.status(403));",
+                  "pm.test('problem type is cors-rejected', () => pm.expect(pm.response.json().type).to.eql('https://billing.example.com/problems/cors-rejected'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "createKey",
+      "value": ""
+    },
+    {
+      "key": "harborId",
+      "value": ""
+    },
+    {
+      "key": "harborCreateResponse",
+      "value": ""
+    },
+    {
+      "key": "floristId",
+      "value": ""
+    },
+    {
+      "key": "spareDraftId",
+      "value": ""
+    },
+    {
+      "key": "harborSent",
+      "value": ""
+    },
+    {
+      "key": "checkoutId",
+      "value": ""
+    },
+    {
+      "key": "paymentUrl",
+      "value": ""
+    },
+    {
+      "key": "partEventId",
+      "value": ""
+    },
+    {
+      "key": "eventId",
+      "value": ""
+    },
+    {
+      "key": "reportResponse",
+      "value": ""
+    },
+    {
+      "key": "sentToCancelId",
+      "value": ""
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: invoices
+  datasource:
+    url: jdbc:postgresql://localhost:5432/invoices
+    username: invoices_app
+    password: invoices_pw
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+server:
+  port: 8081
+
+billing:
+  cors:
+    allowed-origins: https://billing.example.com
+
+springdoc:
+  api-docs:
+    version: openapi_3_1
