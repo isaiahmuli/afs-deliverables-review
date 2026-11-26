@@ -1,0 +1,16 @@
+# Example of another environment: run with --spring.profiles.active=staging.
+spring:
+  http:
+    serviceclient:
+      invoices:
+        base-url: ${INVOICES_BASE_URL:http://invoices.staging.internal:8081}
+        connect-timeout: 1s
+        read-timeout: 3s
+      provider:
+        base-url: ${PROVIDER_BASE_URL:https://sandbox.pay.example.com}
+        connect-timeout: 1s
+        read-timeout: 3s
+
+billing:
+  cors:
+    allowed-origins: https://billing-staging.example.com

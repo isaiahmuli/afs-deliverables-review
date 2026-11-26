@@ -1,0 +1,93 @@
+# payments: ./gradlew clean build from a fresh copy (no build/ or .gradle/), PostgreSQL 18 from compose.yaml
+
+> Task :clean
+> Task :compileJava
+> Task :processResources
+> Task :classes
+> Task :resolveMainClassName
+> Task :bootJar
+> Task :jar
+> Task :assemble
+> Task :compileTestJava
+> Task :processTestResources
+> Task :testClasses
+
+> Task :test
+
+CorsAndOpenApiTest > servesOpenApi31AndALinkMatchesItsSchema() STANDARD_ERROR
+    Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    WARNING: A Java agent has been loaded dynamically (~/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.18.15/de6980bb799c25bb1fe9e6c434201299cb5e694e/byte-buddy-agent-1.18.15.jar)
+    WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+    WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+    WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :test
+
+CorsAndOpenApiTest > servesOpenApi31AndALinkMatchesItsSchema() PASSED
+
+CorsAndOpenApiTest > preflightFromAnUnlistedOriginIsRejected() PASSED
+
+CorsAndOpenApiTest > preflightFromTheBillingAppIsAllowed() PASSED
+
+PaymentLinkTest > whenTheProviderFailsOrIsSlowNoLinkIsStored() STANDARD_OUT
+    2026-11-23T22:18:50.459+03:00  WARN 86099 --- [payments] [    Test worker] c.example.payments.clients.Downstream    : payment provider answered 503 SERVICE_UNAVAILABLE
+    2026-11-23T22:18:53.471+03:00  WARN 86099 --- [payments] [    Test worker] c.example.payments.clients.Downstream    : payment provider did not answer in time: I/O error on POST request for "http://localhost:49914/checkouts": Request cancelled
+
+PaymentLinkTest > whenTheProviderFailsOrIsSlowNoLinkIsStored() PASSED
+
+PaymentLinkTest > anUnknownInvoiceIs404() PASSED
+
+PaymentLinkTest > whenInvoicesFailsPaymentsReturnsItsOwn502() STANDARD_OUT
+    2026-11-23T22:18:53.539+03:00  WARN 86099 --- [payments] [    Test worker] c.example.payments.clients.Downstream    : invoices service answered 500 INTERNAL_SERVER_ERROR
+
+PaymentLinkTest > whenInvoicesFailsPaymentsReturnsItsOwn502() PASSED
+
+PaymentLinkTest > draftCancelledAndPaidInvoicesAreRefused() PASSED
+
+PaymentLinkTest > anInvoiceStatusPaymentsDoesNotKnowIsRefused() PASSED
+
+PaymentLinkTest > whenInvoicesIsSlowerThanThreeSecondsPaymentsReturns504InsteadOfWaiting() STANDARD_OUT
+    2026-11-23T22:18:56.592+03:00  WARN 86099 --- [payments] [    Test worker] c.example.payments.clients.Downstream    : invoices service did not answer in time: I/O error on GET request for "http://localhost:49914/api/v1/invoices/5116047": Request cancelled
+    [timeout] invoices delayed 6 s: payments answered 504 after 3.01 s
+
+PaymentLinkTest > whenInvoicesIsSlowerThanThreeSecondsPaymentsReturns504InsteadOfWaiting() PASSED
+
+PaymentLinkTest > aSentInvoiceGetsALinkAndAskingAgainReturnsTheSameOne() PASSED
+
+PaymentLinkTest > anInvalidRequestIsRefused() PASSED
+
+PaymentReportTest > whenInvoicesFailsTheReportGets502() STANDARD_OUT
+    2026-11-23T22:18:56.729+03:00  WARN 86099 --- [payments] [    Test worker] c.example.payments.clients.Downstream    : invoices service answered 503 SERVICE_UNAVAILABLE
+
+PaymentReportTest > whenInvoicesFailsTheReportGets502() PASSED
+
+PaymentReportTest > aPaymentForACancelledInvoiceIs409() PASSED
+
+PaymentReportTest > reportsThatCannotBeAppliedAre422AndChangeNothing() PASSED
+
+PaymentReportTest > theSameReportAgainGetsTheSameAnswerAndCallsNothing() STANDARD_OUT
+    [report replay] evt-771233bb sent 3 times: applied once, 0 calls to invoices for the 2 resends
+
+PaymentReportTest > theSameReportAgainGetsTheSameAnswerAndCallsNothing() PASSED
+
+PaymentReportTest > theSameEventIdWithDifferentContentIsRefused() PASSED
+
+PaymentReportTest > aFullPaymentMarksTheInvoicePaid() PASSED
+
+PaymentReportTest > whenInvoicesTimesOutTheReportIsRefusedAndTheResendIsApplied() STANDARD_OUT
+    2026-11-23T22:18:59.983+03:00  WARN 86099 --- [payments] [    Test worker] c.example.payments.clients.Downstream    : invoices service did not answer in time: I/O error on PUT request for "http://localhost:49914/api/v1/invoices/5197915/status": Request cancelled
+
+PaymentReportTest > whenInvoicesTimesOutTheReportIsRefusedAndTheResendIsApplied() PASSED
+
+PaymentReportTest > aNewReportForAnAlreadyPaidInvoiceIsProcessedNormally() PASSED
+
+PaymentsApplicationTests > contextLoads() PASSED
+
+> Task :check
+> Task :build
+
+BUILD SUCCESSFUL in 16s
+9 actionable tasks: 9 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.1/userguide/configuration_cache_enabling.html
