@@ -1,0 +1,25 @@
+{
+  "language": {
+    "label": "Sprache",
+    "en-US": "English",
+    "de-DE": "Deutsch"
+  },
+  "reserve": {
+    "title": "Fahrrad reservieren",
+    "nameLabel": "Ihr Name",
+    "stationLabel": "Station",
+    "choose": "Station wählen",
+    "loading": "Stationen werden geladen…",
+    "option": "{{station}} ({{availability}})",
+    "bikesAvailable_one": "{{count}} Fahrrad verfügbar",
+    "bikesAvailable_other": "{{count}} Fahrräder verfügbar",
+    "fee": "Reservierungsgebühr: {{fee}}",
+    "submit": "Reservieren",
+    "nameRequired": "Bitte geben Sie Ihren Namen ein",
+    "failed": "Reservierung nicht möglich. Bitte versuchen Sie es erneut."
+  },
+  "confirmation": {
+    "title": "Reservierung bestätigt",
+    "message": "Danke, {{name}}. Ihr Fahrrad bei {{station}} ist bis {{date}} um {{time}} Uhr reserviert."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "language": {
+    "label": "Language",
+    "en-US": "English",
+    "de-DE": "Deutsch"
+  },
+  "reserve": {
+    "title": "Reserve a bike",
+    "nameLabel": "Your name",
+    "stationLabel": "Station",
+    "choose": "Choose a station",
+    "loading": "Loading stations…",
+    "option": "{{station}} ({{availability}})",
+    "bikesAvailable_one": "{{count}} bike available",
+    "bikesAvailable_other": "{{count}} bikes available",
+    "fee": "Reservation fee: {{fee}}",
+    "submit": "Reserve",
+    "nameRequired": "Please enter your name",
+    "failed": "Could not reserve. Try again."
+  },
+  "confirmation": {
+    "title": "Reservation confirmed",
+    "message": "Thank you, {{name}}. Your bike at {{station}} is held until {{date}} at {{time}}."
+  }
+}
