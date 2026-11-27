@@ -1,7 +1,9 @@
-import { useBookings, useCancelBooking } from '../api/queries'
+import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router'
+import { bookingsQuery, useCancelBooking } from '../api/queries'
 
 export default function BookingList() {
-  const { data, isPending, isError } = useBookings()
+  const { data, isPending, isError } = useQuery(bookingsQuery())
   const cancel = useCancelBooking()
 
   return (
@@ -13,7 +15,7 @@ export default function BookingList() {
       <ul>
         {data?.map((b) => (
           <li key={b.id}>
-            {b.workspaceName} on {b.date}
+            <Link to={`/bookings/${b.id}`}>{b.workspaceName} on {b.date}</Link>{' '}
             <button onClick={() => cancel.mutate(b.id)}>Cancel {b.workspaceName}</button>
           </li>
         ))}

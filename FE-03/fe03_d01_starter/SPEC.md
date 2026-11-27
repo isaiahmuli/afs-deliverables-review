@@ -1,45 +1,74 @@
-# Data spec: workspace booking
+# Spec: workspace booking
 
-Written before coding. All server data lives in the TanStack Query cache; components only keep
-UI selections (city, date, page, tab) in state. Every query key comes from `src/api/queryKeys.ts`.
+Written before coding. Server data lives only in the TanStack Query cache. Components keep only UI
+selections (city, date, page) and form input. Every query key comes from `src/api/queryKeys.ts`.
 
-## Screens
+## Routes
 
-### Browse (WorkspaceList)
+All screens are children of one layout route (`Layout`: header, nav, `<Outlet />`). The root
+route's `errorElement` (`ErrorPage`) renders the same header, so error screens keep it too.
 
-- **Data:** `GET /api/workspaces?city&date&page`, one page of workspaces with `available` for that date.
-- **Key:** `['workspaces', { city, date, page }]`. City, date and page all change the response, so all
-  three are in the key. No `placeholderData`: a new selection shows a loading state, never the
-  previous selection's results.
-- **Freshness:** `staleTime` 30 s. Leaving Browse and coming back within 30 s makes no request; later
-  than that the cached list shows and is refetched in the background.
-- **States:** "Loading workspaces…" until the first response; on failure an alert
-  "Could not load workspaces." with a Try again button.
-- **Writes:** Book (`POST /api/bookings`). On success, invalidate every `['workspaces']` key (the
-  server recomputes availability per date, so only the booked date changes) and `['bookings']`.
-  On failure (409 already booked, 404) show "Booking failed" and leave the cache alone.
+| Address | Screen | Loader | Action |
+|---|---|---|---|
+| `/` | WorkspaceList | none (needs city, date, page from UI state) | none |
+| `/workspaces/:workspaceId` | WorkspaceDetail | `ensureQueryData(workspace)`; 404 → error screen | none |
+| `/workspaces/:workspaceId/book` | BookingForm | same workspace loader | none (form uses a mutation) |
+| `/bookings` | BookingList | none | none |
+| `/bookings/:bookingId` | Confirmation | `ensureQueryData(booking)`; 404 → error screen | `cancel`: POST cancel, then invalidate |
+| `/history` | History | none | none |
+| anything else | ErrorPage "Page not found" (no route matches) | | |
 
-### My bookings (BookingList)
+- The form is reached by the "Book this workspace" link on the workspace page.
+- Back and Forward work because every screen has an address (browser router in the app, memory
+  router in tests).
+- The client throws a `Response` on an HTTP error. A loader lets it propagate, so a missing
+  workspace shows the error screen with status 404.
 
-- **Data:** `GET /api/bookings`. **Key:** `['bookings']`. **Freshness:** `staleTime` 30 s; writes keep it
-  correct through invalidation, so it does not need `Infinity`.
-- **States:** loading text; error alert.
-- **Writes:** Cancel (`DELETE /api/bookings/:id`), optimistic:
-  1. cancel in-flight `['bookings']` queries so a late reply cannot overwrite the change,
-  2. save the current list, remove the booking from the cache,
-  3. on error put the saved list back (same items, same order) and show "Could not cancel",
-  4. on settle invalidate `['bookings']` and `['workspaces']` (the desk is free again on that date).
+## Screen data and freshness
 
-### History
+| Query | Key | staleTime | Why |
+|---|---|---|---|
+| Workspace list | `['workspaces', 'list', { city, date, page }]` | 30 s | availability changes, but not every second |
+| Workspace | `['workspaces', 'detail', id]` | 5 min | names change rarely. Must be > 0, or the screen refetches what the loader just fetched |
+| My bookings | `['bookings', 'list']` | 30 s | writes invalidate it |
+| Booking | `['bookings', 'detail', id]` | 30 s | writes invalidate it |
+| History | `['history']` (infinite, cursor) | 5 min | past bookings don't change |
 
-- **Data:** `GET /api/bookings/history?cursor`, pages of 5 with `nextCursor` (null on the last page).
-- **Key:** `['history']`. Infinite query: first page param `null`, next param = `nextCursor`.
-- **Freshness:** past bookings do not change; `staleTime` 5 min.
-- **States:** loading text; error alert. "Load more" appends the next page below; it disappears when
-  `nextCursor` is null and reads "Loading…" while a page is in flight.
-- **Writes:** none.
+- The list shows "Loading workspaces…" while it loads, and an alert with Try again if it fails. A
+  new city, date or page shows a loading state, never the previous selection's results.
+- Workspace and Confirmation read with `useSuspenseQuery`. The loader filled the cache, so there's
+  no empty frame and no second request.
 
-## Tests (MSW only, fresh QueryClient per test, retries off)
+## Writes
 
-Selection changes, loading and error, staleTime remount and later refetch, booking updates
-Browse and My bookings, optimistic cancel and rollback on a 500, history Load more.
+| Write | Where | Effect |
+|---|---|---|
+| Book (`POST /api/bookings`) | form, mutation | on success invalidate `['workspaces']` and `['bookings']`, then go to `/bookings/:id` |
+| Cancel from My bookings (`POST /api/bookings/:id/cancel`) | mutation, optimistic | cancel `['bookings']` queries, remove it from the list cache, restore the saved list on error, invalidate `['bookings']` and `['workspaces']` when settled |
+| Cancel from Confirmation | route action (`<Form method="post">`) | POST cancel, await invalidation of `['bookings']` and `['workspaces']`. The page re-renders with status "cancelled" |
+
+## Booking rules (Zod, through `zodResolver`)
+
+- `name`: trimmed, at least 1 character → "Enter your name".
+- `email`: a valid email → "Enter a valid email address".
+- `date`: one of the offered dates (a select, so there's no rule to violate; the brief says no date
+  rule).
+- Each message shows beside its own field (`aria-describedby`, `aria-invalid`). When invalid,
+  nothing is sent.
+- A valid booking is sent once. The button is disabled while it's being sent.
+
+## Failures
+
+- Workspace list fails → alert + Try again.
+- Unknown address → "Page not found". Missing workspace or booking → "Not found" with the 404.
+- Booking refused (409, already booked) → a form-level alert "This workspace is already booked on
+  that date". Other errors → "Booking failed".
+- Cancel from My bookings refused → the row comes back where it was, plus an alert.
+- Cancel from Confirmation refused → the action returns an error message, shown as an alert.
+
+## Tests (Vitest, MSW only, fresh QueryClient per test, retries off, memory router)
+
+Query criteria as before (keys, loading and error, staleTime, invalidation, optimistic cancel,
+infinite history), plus routing (navigation, Back, unknown address), loaders (missing workspace,
+no second fetch), the confirmation action, and the form (each rule blocks the send, a valid
+booking is sent once).

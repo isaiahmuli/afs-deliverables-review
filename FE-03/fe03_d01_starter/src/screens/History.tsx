@@ -1,7 +1,9 @@
-import { useHistory } from '../api/queries'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { historyQuery } from '../api/queries'
 
 export default function History() {
-  const { data, isPending, isError, hasNextPage, fetchNextPage, isFetchingNextPage } = useHistory()
+  const { data, isPending, isError, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteQuery(historyQuery())
 
   return (
     <section>

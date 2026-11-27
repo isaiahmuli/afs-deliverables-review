@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw'
+import type { NewBooking } from '../api/types'
 import { HISTORY_PAGE_SIZE, PAGE_SIZE, db, isAvailable } from './db'
 
 // The mock API is fixed: do not change its endpoints or response shapes.
@@ -15,23 +16,15 @@ export const handlers = [
     return HttpResponse.json({ items, page, totalPages: Math.ceil(all.length / PAGE_SIZE) })
   }),
 
-  http.get('/api/bookings', () => HttpResponse.json(db.bookings)),
-
-  http.post('/api/bookings', async ({ request }) => {
-    const { workspaceId, date } = (await request.json()) as { workspaceId: string; date: string }
-    const workspace = db.workspaces.find((w) => w.id === workspaceId)
-    if (!workspace) return new HttpResponse(null, { status: 404 })
-    if (!isAvailable(workspaceId, date)) return new HttpResponse(null, { status: 409 })
-    const booking = { id: `b-${db.nextId++}`, workspaceId, workspaceName: workspace.name, date }
-    db.bookings.push(booking)
-    return HttpResponse.json(booking, { status: 201 })
+  http.get('/api/workspaces/:id', ({ params }) => {
+    const workspace = db.workspaces.find((w) => w.id === params.id)
+    return workspace ? HttpResponse.json(workspace) : new HttpResponse(null, { status: 404 })
   }),
 
-  http.delete('/api/bookings/:id', ({ params }) => {
-    const before = db.bookings.length
-    db.bookings = db.bookings.filter((b) => b.id !== params.id)
-    return new HttpResponse(null, { status: db.bookings.length < before ? 204 : 404 })
-  }),
+  // Confirmed bookings only.
+  http.get('/api/bookings', () =>
+    HttpResponse.json(db.bookings.filter((b) => b.status === 'confirmed')),
+  ),
 
   // Past bookings, newest cursor first. `limit` defaults to 5.
   // Each page is { items, nextCursor }; nextCursor is null on the last page.
@@ -42,5 +35,33 @@ export const handlers = [
     const items = db.history.slice(start, start + limit)
     const next = start + limit
     return HttpResponse.json({ items, nextCursor: next < db.history.length ? String(next) : null })
+  }),
+
+  http.get('/api/bookings/:id', ({ params }) => {
+    const booking = db.bookings.find((b) => b.id === params.id)
+    return booking ? HttpResponse.json(booking) : new HttpResponse(null, { status: 404 })
+  }),
+
+  // Accepts whatever it is sent. It refuses a taken workspace and date with 409.
+  http.post('/api/bookings', async ({ request }) => {
+    const body = (await request.json()) as NewBooking
+    const workspace = db.workspaces.find((w) => w.id === body.workspaceId)
+    if (!workspace) return new HttpResponse(null, { status: 404 })
+    if (!isAvailable(body.workspaceId, body.date)) return new HttpResponse(null, { status: 409 })
+    const booking = {
+      ...body,
+      id: `b-${db.nextId++}`,
+      workspaceName: workspace.name,
+      status: 'confirmed' as const,
+    }
+    db.bookings.push(booking)
+    return HttpResponse.json(booking, { status: 201 })
+  }),
+
+  http.post('/api/bookings/:id/cancel', ({ params }) => {
+    const booking = db.bookings.find((b) => b.id === params.id)
+    if (!booking) return new HttpResponse(null, { status: 404 })
+    booking.status = 'cancelled'
+    return HttpResponse.json(booking)
   }),
 ]
